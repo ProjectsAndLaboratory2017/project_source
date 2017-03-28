@@ -72,6 +72,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetworkDriver.cs" />
+    <Compile Include="NetworkRequest.cs" />
+    <Compile Include="NetworkResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
