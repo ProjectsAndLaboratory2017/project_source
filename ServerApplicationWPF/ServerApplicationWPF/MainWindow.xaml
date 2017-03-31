@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerApplicationWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+        Title="MainWindow" Height="400" Width="720">
+    <Grid Background="#FF7985FF">
+        <ScrollViewer Name="MyScrollViewer" Margin="0,166,0,0" Height="150" VerticalAlignment="Bottom">
+            <TextBlock x:Name="Log" TextWrapping="Wrap" Background="#FFBAD9FF"/>
+        </ScrollViewer>
+        <Image x:Name="ImageDisplay" HorizontalAlignment="Left" VerticalAlignment="Top" Width="320" Height="198" />
     </Grid>
 </Window>
