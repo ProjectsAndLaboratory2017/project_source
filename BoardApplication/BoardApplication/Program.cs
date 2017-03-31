@@ -8,10 +8,6 @@ using Microsoft.SPOT.Presentation.Controls;
 using Microsoft.SPOT.Presentation.Media;
 using Microsoft.SPOT.Presentation.Shapes;
 using Microsoft.SPOT.Touch;
-using System.MarshalByRefObject;
-using System.Drawing;
-using System.Drawing.Image;
-using System.Drawing.Bitmap;
 
 using Gadgeteer.Networking;
 using GT = Gadgeteer;
