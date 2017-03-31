@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServerApplicationWPF
 {
-    class NetworkRequest
+    public class NetworkRequest
     {
         public byte[] Payload { get; private set; }
         public RequestType requestType { get; private set; }
@@ -14,6 +14,12 @@ namespace ServerApplicationWPF
         {
             ImageProcessingRequest = 0,
             ReceiptStorageRequest = 1
+        }
+
+        public NetworkRequest(RequestType type, byte[] content)
+        {
+            requestType = type;
+            Payload = content;
         }
     }
 }
