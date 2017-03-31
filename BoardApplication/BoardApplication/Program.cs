@@ -38,7 +38,7 @@ namespace BoardApplication
 
 
             // Use Debug.Print to show messages in Visual Studio's "Output" window during debugging.
-
+            ethernetJ11D.UseStaticIP("192.168.1.2", "255.255.255.0", "0.0.0.0");
             ethernetJ11D.UseThisNetworkInterface();
             //ethernetJ11D.UseStaticIP("") I have to configure!
             ethernetJ11D.NetworkUp += ethernetJ11D_NetworkUp;
@@ -47,10 +47,18 @@ namespace BoardApplication
             //I call the function ConnectionManagement;
             
             button.ButtonPressed += new Button.ButtonEventHandler(button_ButtonPressed);
-            camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured);
+            
+            
             Debug.Print("Program Started");
 
 
+        }
+
+        private void cameraReady(Camera sender, EventArgs e)
+        {
+            
+            camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured);
+            camera.TakePicture();
         }
 
         private void camera_PictureCaptured(Camera sender, GT.Picture picture)
@@ -72,7 +80,8 @@ namespace BoardApplication
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
         {
-           camera.TakePicture();
+            camera.CameraConnected += new Camera.CameraEventHandler(cameraReady);
+            
         }
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
