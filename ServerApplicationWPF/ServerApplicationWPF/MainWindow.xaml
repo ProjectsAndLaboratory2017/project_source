@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerApplicationWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="720">
+        Title="MainWindow" Height="400" Width="720" Closed="Window_Closed">
     <Grid Background="#FF7985FF">
         <ScrollViewer Name="MyScrollViewer" Margin="0,166,0,0" Height="150" VerticalAlignment="Bottom">
             <TextBlock x:Name="Log" TextWrapping="Wrap" Background="#FFBAD9FF"/>

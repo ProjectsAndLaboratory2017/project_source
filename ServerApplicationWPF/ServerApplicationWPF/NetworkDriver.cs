@@ -24,6 +24,8 @@ namespace ServerApplicationWPF
             this.requestCallback = requestCallback;
             this.messageCallback = messageCallback;
             SocketThread = new Thread(new ParameterizedThreadStart(start_listener));
+            // background threads don't keep app running if other threads terminate
+            SocketThread.IsBackground = true;
             SocketThread.Start();
         }
         private void start_listener(object obj)
@@ -94,7 +96,7 @@ namespace ServerApplicationWPF
             byte[] buffer;
 
             try
-            {
+            {/*
                 // read the request type
                 buffer = new Byte[sizeof(int)];
                 count = sizeof(int);
@@ -106,7 +108,9 @@ namespace ServerApplicationWPF
                     // TODO detect when connection was closed (bytesRead == 0)
                 }
                 type = (NetworkRequest.RequestType)BitConverter.ToInt32(buffer, 0);
-
+                */
+                // TODO For now, only request for images
+                type = NetworkRequest.RequestType.ImageProcessingRequest;
                 // read the 32 bit length
                 buffer = new Byte[sizeof(int)];
                 count = sizeof(int);
@@ -181,7 +185,6 @@ namespace ServerApplicationWPF
             {
                 return false;
             }
-            return true;
         }
 
     }

@@ -45,8 +45,9 @@ namespace ServerApplicationWPF
             {
                 // create bitmap from array of bytes
                 Bitmap image = new Bitmap(new MemoryStream(request.Payload));
+                Bitmap image2 = new Bitmap(image);
                 // show the image
-                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new ImageConsumer(displayImage), image);
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new ImageConsumer(displayImage), image2);
                 // an array of strings
                 ArrayList barcodes = new System.Collections.ArrayList();
                 // do the barcode scan
@@ -77,7 +78,8 @@ namespace ServerApplicationWPF
         private void displayImage(Bitmap image)
         {
             addMessageToLog("Trying to display image");
-            ImageDisplay.Source = (ImageSource)new ImageSourceConverter().ConvertFrom(image);
+            //ImageDisplay.Source = (ImageSource)new ImageSourceConverter().ConvertFrom(image);
+            ImageDisplay.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(image.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
         private void addMessageToLog(string message)
@@ -90,6 +92,11 @@ namespace ServerApplicationWPF
             {
                 Debug.Print("Exception: " + e.Message);
             }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            //Application.Current.Shutdown(); not necessary because other thread is background
         }
     }
 }
