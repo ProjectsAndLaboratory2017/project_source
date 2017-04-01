@@ -45,26 +45,21 @@ namespace BoardApplication
             ethernetJ11D.NetworkDown += ethernetJ11D_NetworkDown;
             //new Thread(RunWebServer).Start();
             //I call the function ConnectionManagement;
+            // instantiate the connection management object
+            connection = new ConnectionManagement();
             
             button.ButtonPressed += new Button.ButtonEventHandler(button_ButtonPressed);
-            
-            
-            Debug.Print("Program Started");
-
-
-        }
-
-        private void cameraReady(Camera sender, EventArgs e)
-        {
-            
             camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured);
-            camera.TakePicture();
+
+
+            Debug.Print("Program Started");
+            
+
         }
 
         private void camera_PictureCaptured(Camera sender, GT.Picture picture)
         {
             displayTE35.SimpleGraphics.DisplayImage(picture, 5, 5);
-            connection.Connect();
             if (connection.isConnected() == true)
             {
                 //Bitmap picture_Captured = new Bitmap(picture, Bitmap.BitmapImageType.Bmp);
@@ -75,13 +70,15 @@ namespace BoardApplication
                     Debug.Print("The image has been sent correctly to the server!");
                 }
                 else Debug.Print("The image has been sent wrongly to the server");
+            } else
+            {
+                Debug.Print("Not connected, not sending");
             }
         }
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
         {
-            camera.CameraConnected += new Camera.CameraEventHandler(cameraReady);
-            
+            camera.TakePicture();
         }
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
@@ -93,6 +90,7 @@ namespace BoardApplication
         {
             Debug.Print("Network is up!");
             Debug.Print("My IP is: " + ethernetJ11D.NetworkSettings.IPAddress);
+            connection.Connect();
         }
 
         void RunWebServer()
