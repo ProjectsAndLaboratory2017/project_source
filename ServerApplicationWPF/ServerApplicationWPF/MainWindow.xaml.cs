@@ -25,12 +25,14 @@ namespace ServerApplicationWPF
     public partial class MainWindow : Window
     {
         private NetworkDriver networkDriver;
+        private CodeScanner codeScanner;
 
         private delegate void StringConsumer(string s);
         private delegate void ImageConsumer(Bitmap image);
         public MainWindow()
         {
             InitializeComponent();
+            codeScanner = new CodeScanner();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
         }
 
@@ -51,12 +53,14 @@ namespace ServerApplicationWPF
                 // an array of strings
                 ArrayList barcodes = new System.Collections.ArrayList();
                 // do the barcode scan
-                BarcodeScanner.FullScanPage(ref barcodes, image, 100);
-                messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
+                //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
+                //messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
+                string result = codeScanner.ScanPage(image);
+                messageProcessing("Scan done. Found: " + result);
                 NetworkResponse response;
                 if (barcodes.Count == 1)
                 {
-                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.ASCII.GetBytes(barcodes[0].ToString()));
+                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.ASCII.GetBytes(result));
                 }
                 else
                 {
