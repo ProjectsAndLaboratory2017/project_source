@@ -64,13 +64,13 @@ namespace BoardApplication
                         Thread.Sleep(1000);
                     }
                     //Using the method Socket you can specify the parameters AddressFamily, type of sockets and type of protocol.
-                    client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                     //Debug.Print("Eseguo connect");
                     /*SetSocketOption method:
                     -SocketOptionLevel: you specify that the socket options are applied only to a particular type of sockets (TCP,IP etc.) 
                     In our case we usa a TCP connection; therefore you apply this option to TCP sockets.
                     */
-                    client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+                    //client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
                     client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.IpTimeToLive, 255);
                     client.Connect(endP);//you connect with the server (It shoul be the handshake phase).
                     f = client.Poll(1000, SelectMode.SelectError); //It determines the status of the socket. True if the connections is not available,
@@ -119,17 +119,17 @@ namespace BoardApplication
                 Byte[] data = BitConverter.GetBytes(img.Length);//length of the img in 32-bit.
                 while (count > 0)
                 {
-                    byteSent = client.Send(data, i, count, SocketFlags.None);//Firstly I send the dimension.
+                    byteSent = client.Send(data, i, count, SocketFlags.Partial);//Firstly I send the dimension.
                     count -= byteSent;
                     i += byteSent;
                 }
                 i = 0;
                 count = img.Length;
-                int invia = 512;
+                int invia = 20000;
                 while (count > 0)
                 {
 
-                    if (count < 512)
+                    if (count < 20000)
                         invia = count;
 
                     byteSent = client.Send(img, i, invia, SocketFlags.None);
