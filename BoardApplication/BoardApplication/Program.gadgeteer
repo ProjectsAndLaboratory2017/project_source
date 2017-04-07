@@ -151,6 +151,21 @@
         </socketUses>
       </module>
     </gadgeteerModelHasGadgeteerHardware>
+    <gadgeteerModelHasGadgeteerHardware Id="0b280583-92ca-4f45-b89d-da9023bf9243">
+      <module Id="a469882c-de2d-403b-95db-4ce456159502" cachedDefinition="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&#xD;&#xA;&lt;ModuleDefinition xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; Name=&quot;Tunes&quot; Manufacturer=&quot;GHI Electronics&quot; Description=&quot;A Tunes module&quot; Type=&quot;Gadgeteer.Modules.GHIElectronics.Tunes&quot; HardwareVersion=&quot;1.0&quot; Image=&quot;C:\Program Files (x86)\GHI Electronics\.NET Gadgeteer SDK\Modules\Tunes\Image.jpg&quot; BoardWidth=&quot;32&quot; BoardHeight=&quot;22&quot; MinimumGadgeteerCoreVersion=&quot;2.43.800&quot; HelpUrl=&quot;http://www.ghielectronics.com/catalog/product/434&quot; UniqueId=&quot;eb388a33-bde1-47c2-b0a4-2ad7b22faab7&quot; InstanceName=&quot;tunes&quot; ModuleSuppliesPower=&quot;false&quot;&gt;&#xD;&#xA;  &lt;Power&gt;&#xD;&#xA;    &lt;PowerRequirements Voltage=&quot;3.3&quot;&gt;&#xD;&#xA;      &lt;TypicalCurrent&gt;0.015&lt;/TypicalCurrent&gt;&#xD;&#xA;      &lt;MaximumCurrent&gt;0.03&lt;/MaximumCurrent&gt;&#xD;&#xA;    &lt;/PowerRequirements&gt;&#xD;&#xA;    &lt;PowerRequirements Voltage=&quot;5&quot;&gt;&#xD;&#xA;      &lt;TypicalCurrent&gt;0&lt;/TypicalCurrent&gt;&#xD;&#xA;      &lt;MaximumCurrent&gt;0&lt;/MaximumCurrent&gt;&#xD;&#xA;    &lt;/PowerRequirements&gt;&#xD;&#xA;  &lt;/Power&gt;&#xD;&#xA;  &lt;ProvidedSockets /&gt;&#xD;&#xA;  &lt;Assemblies&gt;&#xD;&#xA;    &lt;Assembly MFVersion=&quot;4.2&quot; Name=&quot;GTM.GHIElectronics.Tunes&quot; /&gt;&#xD;&#xA;    &lt;Assembly MFVersion=&quot;4.3&quot; Name=&quot;GTM.GHIElectronics.Tunes&quot; /&gt;&#xD;&#xA;  &lt;/Assemblies&gt;&#xD;&#xA;  &lt;LibrariesProvided /&gt;&#xD;&#xA;  &lt;Sockets&gt;&#xD;&#xA;    &lt;Socket Orientation=&quot;90&quot; Left=&quot;14.5&quot; Top=&quot;18&quot; TypesLabel=&quot;P&quot; ConstructorOrder=&quot;1&quot; Optional=&quot;false&quot;&gt;&#xD;&#xA;      &lt;Types&gt;&#xD;&#xA;        &lt;Type&gt;P&lt;/Type&gt;&#xD;&#xA;      &lt;/Types&gt;&#xD;&#xA;      &lt;Pins&gt;&#xD;&#xA;        &lt;Pin Shared=&quot;false&quot;&gt;9&lt;/Pin&gt;&#xD;&#xA;      &lt;/Pins&gt;&#xD;&#xA;    &lt;/Socket&gt;&#xD;&#xA;  &lt;/Sockets&gt;&#xD;&#xA;  &lt;ExtraLibrariesRequired /&gt;&#xD;&#xA;&lt;/ModuleDefinition&gt;" name="tunes" moduleType="Gadgeteer.Modules.GHIElectronics.Tunes" moduleDefinitionId="eb388a33-bde1-47c2-b0a4-2ad7b22faab7">
+        <socketUses>
+          <moduleHasSocketUses Id="31d8bba2-24c2-4200-a4fd-001f536ab017">
+            <socketUse Id="46577cd8-1825-46f6-83e5-0f1f80536a2b" label="P">
+              <socket>
+                <socketUseReferencesSocket Id="ceaaf14e-7fe2-4aad-a897-bf48eac40819">
+                  <socketMoniker Id="ac179917-4483-479e-bd12-1ae3a0a1ad29" />
+                </socketUseReferencesSocket>
+              </socket>
+            </socketUse>
+          </moduleHasSocketUses>
+        </socketUses>
+      </module>
+    </gadgeteerModelHasGadgeteerHardware>
   </gadgeteerHardware>
   <comments>
     <gadgeteerModelHasComments Id="2fc852fa-5113-40bf-9818-f0e7fe65a8c2">

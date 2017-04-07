@@ -53,6 +53,16 @@ namespace BoardApplication
 
 
             Debug.Print("Program Started");
+
+            //welcome tune
+            
+            Tunes.MusicNote[] notes = new Tunes.MusicNote[4];
+            notes[0] = new Tunes.MusicNote(Tunes.Tone.C4, 150);
+            notes[1] = new Tunes.MusicNote(Tunes.Tone.E4, 150);
+            notes[2] = new Tunes.MusicNote(Tunes.Tone.G4, 150);
+            notes[3] = new Tunes.MusicNote(Tunes.Tone.C5, 300);
+
+            tunes.Play(notes);
             
 
         }
@@ -78,6 +88,7 @@ namespace BoardApplication
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
         {
+            tunes.Play(1100, 300);
             camera.TakePicture();
         }
 
