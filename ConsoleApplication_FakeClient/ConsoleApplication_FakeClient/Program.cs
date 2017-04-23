@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -22,15 +24,29 @@ namespace ConsoleApplication_FakeClient
             int token = client.AskToken();
             Console.WriteLine("Client received token " + token);
 
-            int size = 1000000;
+            Bitmap image = new Bitmap("E:\\test.bmp");
 
-            byte[] data = new byte[size];
-            for (int i = 0; i < size; i++)
-            {
-                data[i] = (byte)(i / 10);
-            }
+            MemoryStream ms = new MemoryStream();
+            image.Save(ms, image.RawFormat);
+            byte[] data = ms.ToArray();
+
             client.SendData(data, token);
             byte[] response = client.ReceiveData(token);
+            Console.WriteLine("received response: " + System.Text.Encoding.Default.GetString(response));
+
+
+
+            token = client.AskToken();
+            Console.WriteLine("Client received token " + token);
+
+            image = new Bitmap("E:\\test2.bmp");
+
+            ms = new MemoryStream();
+            image.Save(ms, image.RawFormat);
+            data = ms.ToArray();
+
+            client.SendData(data, token);
+            response = client.ReceiveData(token);
             Console.WriteLine("received response: " + System.Text.Encoding.Default.GetString(response));
         }
 
