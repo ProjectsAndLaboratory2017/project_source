@@ -69,6 +69,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UDPNetwork\Client.cs" />
+    <Compile Include="UDPNetwork\Peer.cs" />
+    <Compile Include="UDPNetwork\Server.cs" />
+    <Compile Include="UDPNetwork\TokenAndData.cs" />
+    <Compile Include="UDPNetwork\Utils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
