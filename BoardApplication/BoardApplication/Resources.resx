@@ -121,7 +121,25 @@
   <data name="NinaB" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\NinaB.tinyfnt;System.Byte[], mscorlib, Culture=neutral, PublicKeyToken=null</value>
   </data>
+  <data name="NormalButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\NormalButton.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="payButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\payButton.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="payButtonPressed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\payButtonPressed.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="PressedButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\PressedButton.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="PressedStartBuying" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\PressedStartBuying.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
   <data name="small" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\small.tinyfnt;System.Byte[], mscorlib, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="startBuying" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\startBuying.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
 </root>

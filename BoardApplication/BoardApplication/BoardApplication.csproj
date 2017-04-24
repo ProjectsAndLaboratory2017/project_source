@@ -121,4 +121,22 @@
     <None Include="Resources\NinaB.tinyfnt" />
     <None Include="Resources\small.tinyfnt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NormalButton.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\payButton.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\payButtonPressed.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PressedButton.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PressedStartBuying.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\startBuying.jpg" />
+  </ItemGroup>
 </Project>
