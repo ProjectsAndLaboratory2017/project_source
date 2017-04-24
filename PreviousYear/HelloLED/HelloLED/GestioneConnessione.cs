@@ -1,7 +1,7 @@
 using System;
 using Microsoft.SPOT;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace HelloLED
@@ -9,12 +9,15 @@ namespace HelloLED
     class GestioneConnessione
     {
         private Socket clientS = null;
-        private bool inConnessione = false;
-        private bool connesso = false;
+        private bool inConnessione = false; //false = a process connected to the serve has not been instantiated yet, otherwise it's true.
+        private bool connesso = false; //
         private IPEndPoint endPoint;
 
         public GestioneConnessione()
-        {
+        {	
+			//IPEndPoint: this method allows you to instantiate the address and port number of the endpoint.
+			//IPAddress.Parse("IPAddress")-->This method converts an IP address string to an IPAddress instance.
+			//Both methods use the library System.Net.IPEndPoint. This namespace is contained in the .dll file System.dll
             endPoint = new IPEndPoint(IPAddress.Parse("192.168.1.1"), 8000);
         }
 
@@ -23,10 +26,11 @@ namespace HelloLED
             if (!inConnessione && !connesso)
             {
                 try
-                {
+                {	
                     Debug.Print("Nuovo thread per connettersi al server");
                     inConnessione = true;
-
+	
+					//ThreadStart: method that executes a thread that has been created previously.
                     ThreadStart threadStart = new ThreadStart(connettiServer);
                     Thread thread = new Thread(threadStart);
                     thread.Start();
@@ -50,21 +54,33 @@ namespace HelloLED
                 bool f = true;
                 while (f)
                 {
-                    if (clientS != null)
+                    if (clientS != null)//if the client is busy with another connection I close it and I create another one.
                     {
                         clientS.Close();
+						//Thread.Sleep(Millisecond value)-->The number of milliseconds for which the thread is suspended. 
+						//If the value of the millisecondsTimeout argument is zero, the thread relinquishes the remainder 
+						//of its time slice to any thread of equal priority that is ready to run. If there are no other threads 
+						//of equal priority that are ready to run, execution of the current thread is not suspended.
                         Thread.Sleep(1000);
                     }
+					//Using the method Socket you can specify the parameters AddressFamily, type of sockets and type of protocol.
                     clientS = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     //Debug.Print("Eseguo connect");
+					/*SetSocketOption method:
+					-SocketOptionLevel: you specify that the socket options are applied only to a particular type of sockets (TCP,IP etc.) 
+					In our case we usa a TCP connection; therefore you apply this option to TCP sockets.
+					*/
                     clientS.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
                     clientS.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.IpTimeToLive, 255);
-                    clientS.Connect(endPoint);
-                    f = clientS.Poll(1000, SelectMode.SelectError);
+                    clientS.Connect(endPoint);//you connect with the server (It shoul be the handshake phase).
+                    f = clientS.Poll(1000, SelectMode.SelectError); //It determines the status of the socket. True if the connections is not available,
+																	//otherwise it's false.
                 }
                 Debug.Print("Connessione al server riuscita");
-                connesso = true;
-                inConnessione = false;
+                connesso = true; //The connection between client and server is instantiated.
+                inConnessione = false; //Credo che serva per quando viene chiusa la connessione (quindi connesso diventa pari a false) e in 
+									   //questo modo se la board vuole stabilire una nuova connessione (e quindi un nuovo thread) può farlo.
+									   //Ciò è dovuto alla presenza dell'if in riga 26. Io personalmente non lo metterei qui. Vedi in seguito dove piazzarlo.
             }
             catch (Exception e)
             {
@@ -98,12 +114,12 @@ namespace HelloLED
                 {
                     return false;
                 }
-                int count = sizeof(Int32);
+                int count = sizeof(Int32); //dimension of the image.
                 int i = 0, byteInviati;
-                Byte[] data = BitConverter.GetBytes(img.Length);
+                Byte[] data = BitConverter.GetBytes(img.Length);//length of the img in 32-bit.
                 while (count > 0)
                 {
-                    byteInviati = clientS.Send(data, i, count, SocketFlags.None);
+                    byteInviati = clientS.Send(data, i, count, SocketFlags.None);//Firstly I send the dimension.
                     count -= byteInviati;
                     i += byteInviati;
                 }
@@ -124,7 +140,7 @@ namespace HelloLED
 
                     //Thread.Sleep(15);
                 }
-                return true;
+                return true; //this return value if all the sending have succesful
             }
             catch (Exception e)
             {
