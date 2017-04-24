@@ -1,0 +1,58 @@
+@CHARSET "ISO-8859-1";
+
+.rm{
+	margin-bottom: 0px;
+}
+
+.fezImg img{
+/*	width: 1300px; */
+	width: 80%;
+	height: 500px;
+	max-height: 500px;
+	padding-left: 200px;
+	padding-right: 200px;
+	margin-left: 130px;
+}
+
+.footer {
+	height: 50px;
+  	text-align: center;
+	font-size: 16px;
+	font-style: italic;
+} 
+
+.times-new-roman{
+	font-family: "Times New Roman", Georgia, Serif;
+}
+
+.btn-text{
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.header{
+	font-size: 30px;
+	color: white;
+	font-weight: bolder;
+	font-style: italic;
+}
+
+.login-text{
+	padding-top: 20px;
+	font-size: 20px;
+	color: white;
+	
+}
+
+a:HOVER {
+	color: white;
+	text-decoration: none;
+}
+
+.table-font{
+	font-size: 18px;
+}
+
+.table-font a:HOVER {
+	color: maroon;
+}
