@@ -14,12 +14,12 @@ namespace ServerApplicationWPF.UDPNetwork
 
         public static byte[] StringToBytes(string s)
         {
-            return System.Text.Encoding.Default.GetBytes(s);
+            return System.Text.Encoding.UTF8.GetBytes(s);
         }
 
         public static string BytesToString(byte[] bytes)
         {
-            return System.Text.Encoding.Default.GetString(bytes);
+            return new string(System.Text.Encoding.UTF8.GetChars(bytes));
         }
     }
 }

@@ -16,7 +16,7 @@ namespace ServerApplicationWPF.UDPNetwork
 
         public int AskToken()
         {
-            byte[] req = System.Text.Encoding.Default.GetBytes("I want a token");
+            byte[] req = Utils.StringToBytes("I want a token");
             TokenAndData reqTD = new TokenAndData(0, req);
             try
             {

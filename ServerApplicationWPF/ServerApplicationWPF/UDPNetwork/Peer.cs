@@ -25,7 +25,7 @@ namespace ServerApplicationWPF.UDPNetwork
                 int send_now = Math.Min(toSend, Utils.CHUNK_SIZE);
                 byte[] buff = new byte[send_now];
                 int sent = 0;
-                Buffer.BlockCopy(data, start_offset, buff, 0, send_now);
+                Array.Copy(data, start_offset, buff, 0, send_now);
                 // create the datagram content: token followed by a chunk of data
                 TokenAndData dgram = new TokenAndData(token, buff);
                 sent = udpClient.Send(dgram.Serialized, dgram.Serialized.Length);
@@ -69,12 +69,12 @@ namespace ServerApplicationWPF.UDPNetwork
                 {
                     throw new Exception("Wrong token " + dgram_parsed.Token);
                 }
-                Buffer.BlockCopy(data_parsed.Data, 0, result, start_offset, data_parsed.Data.Length);
+                Array.Copy(data_parsed.Data, 0, result, start_offset, data_parsed.Data.Length);
                 start_offset += data_parsed.Data.Length;
                 toRead -= data_parsed.Data.Length;
             }
             // now send the ACK
-            TokenAndData ack = new TokenAndData(token, System.Text.Encoding.Default.GetBytes("ack"));
+            TokenAndData ack = new TokenAndData(token, Utils.StringToBytes("ack"));
             udpClient.Send(ack.Serialized, ack.Serialized.Length);
 
             return result;

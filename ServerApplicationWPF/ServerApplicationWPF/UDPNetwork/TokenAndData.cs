@@ -13,7 +13,7 @@ namespace ServerApplicationWPF.UDPNetwork
             Serialized = tokenAndData;
             Data = new byte[tokenAndData.Length - sizeof(int)];
             Token = BitConverter.ToInt32(tokenAndData, 0);
-            Buffer.BlockCopy(tokenAndData, sizeof(int), Data, 0, Data.Length);
+            Array.Copy(tokenAndData, sizeof(int), Data, 0, Data.Length);
         }
 
         public TokenAndData(int token, byte[] data)
@@ -21,8 +21,8 @@ namespace ServerApplicationWPF.UDPNetwork
             Token = (int)token;
             Data = data;
             Serialized = new byte[sizeof(uint) + data.Length];
-            Buffer.BlockCopy(BitConverter.GetBytes(Token), 0, Serialized, 0, sizeof(int));
-            Buffer.BlockCopy(Data, 0, Serialized, sizeof(int), data.Length);
+            Array.Copy(BitConverter.GetBytes(Token), 0, Serialized, 0, sizeof(int));
+            Array.Copy(Data, 0, Serialized, sizeof(int), data.Length);
             
         }
     }
