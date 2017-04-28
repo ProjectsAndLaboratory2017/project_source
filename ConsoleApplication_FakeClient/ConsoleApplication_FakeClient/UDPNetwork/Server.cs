@@ -26,11 +26,6 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
         {
             TokenAndData request_parsed;
 
-            if (socket.Connected)
-            {
-                socket.Disconnect(true);
-            }
-
             socket.ReceiveTimeout = -1;
             do
             {

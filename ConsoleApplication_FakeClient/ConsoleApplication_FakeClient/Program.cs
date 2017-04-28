@@ -24,7 +24,7 @@ namespace ConsoleApplication_FakeClient
             int token = client.AskToken();
             Console.WriteLine("Client received token " + token);
 
-            Bitmap image = new Bitmap("E:\\test3.bmp");
+            Bitmap image = new Bitmap("E:\\small.bmp");
 
             MemoryStream ms = new MemoryStream();
             image.Save(ms, image.RawFormat);
@@ -39,7 +39,7 @@ namespace ConsoleApplication_FakeClient
             token = client.AskToken();
             Console.WriteLine("Client received token " + token);
 
-            image = new Bitmap("E:\\test2.bmp");
+            image = new Bitmap("E:\\small.bmp");
 
             ms = new MemoryStream();
             image.Save(ms, image.RawFormat);
