@@ -11,5 +11,8 @@
             <TextBlock x:Name="Log" TextWrapping="Wrap" Background="#FFBAD9FF"/>
         </ScrollViewer>
         <Image x:Name="ImageDisplay" HorizontalAlignment="Left" VerticalAlignment="Top" Width="320" Height="198" />
+        <TextBox x:Name="barcode_txt" HorizontalAlignment="Left" Height="24" Margin="500,34,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="625,38,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <TextBlock x:Name="db_output" HorizontalAlignment="Left" Margin="500,63,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
     </Grid>
 </Window>

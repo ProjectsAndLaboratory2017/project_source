@@ -4,13 +4,12 @@ using System.Net.Sockets;
 
 namespace ServerApplicationWPF.UDPNetwork
 {
-    public class Client:Peer
+    public class Client : Peer
     {
         public Client(IPEndPoint serverEndpoint)
         {
-            udpClient = new UdpClient();
-            udpClient.Client.ReceiveTimeout = 10000;
-            udpClient.Connect(serverEndpoint);
+            socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
+            socket.Connect(serverEndpoint);
             remoteEndpoint = serverEndpoint;
         }
 
@@ -20,8 +19,9 @@ namespace ServerApplicationWPF.UDPNetwork
             TokenAndData reqTD = new TokenAndData(0, req);
             try
             {
-                udpClient.Send(reqTD.Serialized, reqTD.Serialized.Length);
-                byte[] res = udpClient.Receive(ref remoteEndpoint);
+                socket.Send(reqTD.Serialized);
+                byte[] res = new byte[Utils.DGRAM_MAX_SIZE];
+                socket.Receive(res);
                 TokenAndData resTD = new TokenAndData(res);
                 if (resTD.Token != 0)
                 {

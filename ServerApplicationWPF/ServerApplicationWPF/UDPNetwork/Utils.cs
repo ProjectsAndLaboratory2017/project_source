@@ -7,7 +7,8 @@ namespace ServerApplicationWPF.UDPNetwork
         // never want fragmentation: MTU = 1500 usually
         // IP header = 20
         // UDP header = 8
-        public static int CHUNK_SIZE = 1472 - sizeof(int);
+        public static int DGRAM_MAX_SIZE = 1472;
+        public static int CHUNK_SIZE = DGRAM_MAX_SIZE - sizeof(int);
         public static string TOKEN_REQUEST = "give_me_a_token";
         public static string ACK = "ack";
         public static int RECEIVE_TIMEOUT = 20000; // timeout between net request and response/ack or between token generation and usage

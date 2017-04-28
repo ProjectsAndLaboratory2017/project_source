@@ -24,12 +24,12 @@ namespace ConsoleApplication_FakeClient
             int token = client.AskToken();
             Console.WriteLine("Client received token " + token);
 
-            Bitmap image = new Bitmap("E:\\test.bmp");
+            Bitmap image = new Bitmap("E:\\test3.bmp");
 
             MemoryStream ms = new MemoryStream();
             image.Save(ms, image.RawFormat);
             byte[] data = ms.ToArray();
-
+            Console.WriteLine("Going to send " + data.Length + " bytes");
             client.SendData(data, token);
             byte[] response = client.ReceiveData(token);
             Console.WriteLine("received response: " + System.Text.Encoding.Default.GetString(response));
@@ -44,7 +44,7 @@ namespace ConsoleApplication_FakeClient
             ms = new MemoryStream();
             image.Save(ms, image.RawFormat);
             data = ms.ToArray();
-
+            Console.WriteLine("Going to send " + data.Length + " bytes");
             client.SendData(data, token);
             response = client.ReceiveData(token);
             Console.WriteLine("received response: " + System.Text.Encoding.Default.GetString(response));

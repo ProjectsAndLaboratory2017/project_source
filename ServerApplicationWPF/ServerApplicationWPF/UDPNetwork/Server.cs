@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace ServerApplicationWPF.UDPNetwork
 {
-    public class Server:Peer
+    public class Server : Peer
     {
         private Random randomGenerator;
         bool valid;
@@ -13,6 +13,8 @@ namespace ServerApplicationWPF.UDPNetwork
         {
             valid = false;
             this.port = port;
+            IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, port);
+            socket.Bind(localEndpoint);
             randomGenerator = new Random(System.DateTime.Now.Millisecond);
         }
 
@@ -23,25 +25,27 @@ namespace ServerApplicationWPF.UDPNetwork
         public int Accept()
         {
             TokenAndData request_parsed;
-            // create new udpClient with infinite timeout and no remote ip connected
-            if (udpClient != null)
+
+            if (socket.Connected)
             {
-                udpClient.Close();
+                socket.Disconnect(true);
             }
-            udpClient = new UdpClient(port);
+
+            socket.ReceiveTimeout = -1;
             do
             {
                 remoteEndpoint = new IPEndPoint(IPAddress.Any, 0);
-                byte[] request = udpClient.Receive(ref remoteEndpoint);
+                byte[] request = new byte[Utils.DGRAM_MAX_SIZE];
+                socket.ReceiveFrom(request, ref remoteEndpoint);
                 request_parsed = new TokenAndData(request);
             } while (request_parsed.Token != 0); // TODO could also check data "I want a token"
             // connect to this specific client
-            udpClient.Connect(remoteEndpoint);
+            socket.Connect(remoteEndpoint);
 
             int token = randomGenerator.Next();
 
             TokenAndData response_token = new TokenAndData(0, BitConverter.GetBytes(token));
-            udpClient.Send(response_token.Serialized, response_token.Serialized.Length);
+            socket.Send(response_token.Serialized);
 
             valid = true;
             return token;
