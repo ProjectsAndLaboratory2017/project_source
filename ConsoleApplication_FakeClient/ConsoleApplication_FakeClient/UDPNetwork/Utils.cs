@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 
 namespace ConsoleApplication_FakeClient.UDPNetwork
 {
@@ -21,6 +23,24 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
         public static string BytesToString(byte[] bytes)
         {
             return new string(System.Text.Encoding.UTF8.GetChars(bytes));
+        }
+
+        public static byte[] ReceiveFrom(Socket socket, ref EndPoint remoteEndPoint)
+        {
+            byte[] dgram = new byte[DGRAM_MAX_SIZE];
+            int dgram_size = socket.ReceiveFrom(dgram, ref remoteEndPoint);
+            byte[] effective_dgram = new byte[dgram_size];
+            Array.Copy(dgram, effective_dgram, dgram_size);
+            return effective_dgram;
+        }
+
+        public static byte[] Receive(Socket socket)
+        {
+            byte[] dgram = new byte[DGRAM_MAX_SIZE];
+            int dgram_size = socket.Receive(dgram);
+            byte[] effective_dgram = new byte[dgram_size];
+            Array.Copy(dgram, effective_dgram, dgram_size);
+            return effective_dgram;
         }
     }
 }

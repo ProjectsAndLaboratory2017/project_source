@@ -6,8 +6,6 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
 {
     public class Server : Peer
     {
-
-        protected EndPoint remoteEndpoint;
         private Random randomGenerator;
         bool valid;
         private int port;
@@ -28,22 +26,25 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
         {
             TokenAndData request_parsed;
 
-            socket.Disconnect(true);
+            if (socket.Connected)
+            {
+                socket.Disconnect(true);
+            }
+
             socket.ReceiveTimeout = -1;
             do
             {
                 remoteEndpoint = new IPEndPoint(IPAddress.Any, 0);
-                byte[] request = new byte[Utils.DGRAM_MAX_SIZE];
-                socket.ReceiveFrom(request, ref remoteEndpoint);
-                request_parsed = new TokenAndData(request);
+                byte[] datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
+                request_parsed = new TokenAndData(datagram);
             } while (request_parsed.Token != 0); // TODO could also check data "I want a token"
             // connect to this specific client
-            socket.Connect(remoteEndpoint);
+            //socket.Connect(remoteEndpoint);
 
             int token = randomGenerator.Next();
 
             TokenAndData response_token = new TokenAndData(0, BitConverter.GetBytes(token));
-            socket.Send(response_token.Serialized);
+            socket.SendTo(response_token.Serialized, remoteEndpoint);
 
             valid = true;
             return token;

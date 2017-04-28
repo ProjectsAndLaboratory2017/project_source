@@ -5,7 +5,7 @@ namespace ServerApplicationWPF.UDPNetwork
     public class TokenAndData
     {
         public byte[] Serialized { get; private set; }
-        public int Token {get; private set; }
+        public int Token { get; private set; }
         public byte[] Data { get; private set; }
 
         public TokenAndData(byte[] tokenAndData)
@@ -23,7 +23,7 @@ namespace ServerApplicationWPF.UDPNetwork
             Serialized = new byte[sizeof(uint) + data.Length];
             Array.Copy(BitConverter.GetBytes(Token), 0, Serialized, 0, sizeof(int));
             Array.Copy(Data, 0, Serialized, sizeof(int), data.Length);
-            
+
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
             int toSend = data.Length;
             // send the length
             TokenAndData length_dgram = new TokenAndData(token, BitConverter.GetBytes(data.Length));
-            socket.Send(length_dgram.Serialized);
+            socket.SendTo(length_dgram.Serialized, remoteEndpoint);
             int start_offset = 0;
             while (toSend > 0)
             {
@@ -28,16 +28,14 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
                 Array.Copy(data, start_offset, buff, 0, send_now);
                 // create the datagram content: token followed by a chunk of data
                 TokenAndData dgram = new TokenAndData(token, buff);
-                sent = socket.Send(dgram.Serialized);
+                sent = socket.SendTo(dgram.Serialized, remoteEndpoint);
                 toSend -= send_now;
                 start_offset += send_now;
             }
             // now wait for the ACK a limited time
             socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
-            byte[] response = new byte[Utils.DGRAM_MAX_SIZE];
-
-            socket.Receive(response);
-            TokenAndData response_parsed = new TokenAndData(response);
+            byte[] datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
+            TokenAndData response_parsed = new TokenAndData(datagram);
             if (response_parsed.Token != token)
             {
                 throw new Exception("The server answered with another token: " + response_parsed.Token);
@@ -54,9 +52,8 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
             // wait for a limited time because a token has limited lifespan
             socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
             // read the length
-            byte[] dgram = new byte[Utils.DGRAM_MAX_SIZE];
-            socket.Receive(dgram);
-            TokenAndData dgram_parsed = new TokenAndData(dgram);
+            byte[] datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
+            TokenAndData dgram_parsed = new TokenAndData(datagram);
             int toRead = BitConverter.ToInt32(dgram_parsed.Data, 0);
             if (dgram_parsed.Token != token)
             {
@@ -66,9 +63,8 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
             int start_offset = 0;
             while (toRead > 0)
             {
-                byte[] dgram_data = new byte[Utils.DGRAM_MAX_SIZE];
-                socket.Receive(dgram_data);
-                TokenAndData data_parsed = new TokenAndData(dgram_data);
+                datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
+                TokenAndData data_parsed = new TokenAndData(datagram);
                 if (data_parsed.Token != token)
                 {
                     throw new Exception("Wrong token " + dgram_parsed.Token);
@@ -79,7 +75,7 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
             }
             // now send the ACK
             TokenAndData ack = new TokenAndData(token, Utils.StringToBytes(Utils.ACK));
-            socket.Send(ack.Serialized);
+            socket.SendTo(ack.Serialized, remoteEndpoint);
 
             return result;
         }

@@ -20,8 +20,7 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
             try
             {
                 socket.Send(reqTD.Serialized);
-                byte[] res = new byte[Utils.DGRAM_MAX_SIZE];
-                socket.Receive(res);
+                byte[] res = Utils.Receive(socket);
                 TokenAndData resTD = new TokenAndData(res);
                 if (resTD.Token != 0)
                 {
