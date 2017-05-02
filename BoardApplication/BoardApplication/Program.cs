@@ -10,23 +10,35 @@ using Microsoft.SPOT.Presentation.Shapes;
 using Microsoft.SPOT.Touch;
 using Microsoft.SPOT.Input;
 
+using System.IO;
+using System.Net;
+using System.Text;
+
+
+
 using Gadgeteer.Networking;
 using GT = Gadgeteer;
 using GTM = Gadgeteer.Modules;
+using BoardApplication.JsonSerialize;
 
 
 namespace BoardApplication
 {
     public partial class Program
     {
-        private ConnectionManagement connection;
+        //private ConnectionManagement connection;
         //Variable used to display the GUI.
+        private Client client;
         private Text txtMessage;
         private Bitmap normalButton;
         private Bitmap pressedButton;
         private Image imgButton;
         private Boolean flagButtonPressHere = false;
         private Window window;
+        private ArrayList l = new ArrayList();
+        private int flagThread = 0;
+        private HttpWebRequest clientReq;
+        
         // This method is run when the mainboard is powered up or reset.   
         void ProgramStarted()
         {
@@ -43,38 +55,48 @@ namespace BoardApplication
                 timer.Start();
             *******************************************************************************************/
 
-            window = displayTE35.WPFWindow;
-            createWindowOne();
 
 
             // Use Debug.Print to show messages in Visual Studio's "Output" window during debugging.
-             ethernetJ11D.UseStaticIP("192.168.1.2", "255.255.255.0", "0.0.0.0");
-             ethernetJ11D.UseThisNetworkInterface();
-            ethernetJ11D.NetworkUp += ethernetJ11D_NetworkUp;
+             String[] array = {"192.168.1.1"};
+             ethernetJ11D.NetworkInterface.Open();
+             ethernetJ11D.NetworkInterface.EnableStaticIP("192.168.1.2", "255.255.255.0", "192.168.1.1");
+             ethernetJ11D.NetworkInterface.EnableStaticDns(array);
+             
+             ethernetJ11D.NetworkUp += ethernetJ11D_NetworkUp;
              ethernetJ11D.NetworkDown += ethernetJ11D_NetworkDown;
-             new Thread(RunWebServer).Start();
-            //I call the function ConnectionManagement;
-            // instantiate the connection management object
-             connection = new ConnectionManagement();
-            
-            button.ButtonPressed += new Button.ButtonEventHandler(button_ButtonPressed);
-            camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured);
 
+             while (ethernetJ11D.NetworkInterface.IPAddress == "0.0.0.0")
+             {
+                 Debug.Print("Waiting for DHCP");
+                 Thread.Sleep(250);
+             }
+
+             camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured); 
+             button.ButtonPressed += new Button.ButtonEventHandler(button_ButtonPressed);
+             
+             
 
             Debug.Print("Program Started");
 
             //welcome tune
-            
+        /*    
             Tunes.MusicNote[] notes = new Tunes.MusicNote[4];
             notes[0] = new Tunes.MusicNote(Tunes.Tone.C4, 150);
             notes[1] = new Tunes.MusicNote(Tunes.Tone.E4, 150);
             notes[2] = new Tunes.MusicNote(Tunes.Tone.G4, 150);
             notes[3] = new Tunes.MusicNote(Tunes.Tone.C5, 300);
 
-            tunes.Play(notes);
-            
+            tunes.Play(notes);*/
 
+            window = displayTE35.WPFWindow;
+
+            createWindowOne();
+         
         }
+
+       
+
         //Touch event linked to the first window.
         void imgButton_TouchUp(object sender, TouchEventArgs e)
         {
@@ -91,7 +113,6 @@ namespace BoardApplication
         {
             imgButton.Bitmap = pressedButton;
             flagButtonPressHere = true;
-
         }
 
         //FIRST WINDOW
@@ -202,8 +223,9 @@ namespace BoardApplication
             canvas.Children.Add(txtMessage);
 
 
-            ArrayList l = new ArrayList();
-            //Here I develop the communication in order to get the objects.
+           
+          //  Here I develop the communication in order to get the objects
+       /*
             int i = 2, tot = 0;
             l.Add("Bread          " + i.ToString() + "$");
             tot += i;
@@ -215,6 +237,7 @@ namespace BoardApplication
             tot += i;
             i++;
             l.Add("Mais          " + i.ToString() + "$");
+
             tot += i;
             i++;
             l.Add("Apple         " + i.ToString() + "$");
@@ -223,16 +246,11 @@ namespace BoardApplication
             l.Add("Salad         " + i.ToString() + "$");
             tot += i;
             i++;
-            l.Add("Chreme          " + i.ToString() + "$");
-            tot += i;
-            i++;
-            l.Add("Orange juice          " + i.ToString() + "$");
-            tot += i;
-            i++;
-            l.Add("Total price is: " + tot.ToString() + "$");
+           */
 
             int top = 30;
             int left = 30;
+            int i;
             for (i = 0; i < l.Count; i++)
             {
                 txtMessage = new Text(baseFont, l[i].ToString());
@@ -293,52 +311,45 @@ namespace BoardApplication
        
         private void camera_PictureCaptured(Camera sender, GT.Picture picture)
         {
-            //displayTE35.SimpleGraphics.DisplayImage(picture, 5, 5);
-            if (connection.isConnected() == true)
+            byte[] result = new byte[65536];
+            int read = 0;
+
+            using (var req = HttpWebRequest.Create("http://192.168.1.1/") as HttpWebRequest)
             {
-                //Bitmap picture_Captured = new Bitmap(picture, Bitmap.BitmapImageType.Bmp);
-                // allocate buffer
-                byte[] img = picture.PictureData;
-                if (connection.WriteStream(img) == true)
+                using (var res = req.GetResponse() as HttpWebResponse)
                 {
-                    //Here i have to fill the list to use in order to show the products on the screen
-                    //Chiamata al window3
-                    Debug.Print("The image has been sent correctly to the server!");
+                    using (var stream = res.GetResponseStream())
+                    {
+                        do
+                        {
+                            read = stream.Read(result, 0, result.Length);
+                            Debug.Print("received" + result.Length);
+                            Thread.Sleep(20);
+                        } while (read != 0);
+                    }
                 }
-                else Debug.Print("The image has been sent wrongly to the server");
-            } else
-            {
-                Debug.Print("Not connected, not sending");
             }
         }
+        
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
         {
-            tunes.Play(1100, 300);
+           // tunes.Play(1100, 300);
             camera.TakePicture();
         }
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("Network is down!");
-            connection.annullaConnessione();
         }
 
         void ethernetJ11D_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("Network is up!");
             Debug.Print("My IP is: " + ethernetJ11D.NetworkSettings.IPAddress);
-            connection.Connect();
+            ethernetJ11D.NetworkInterface.Open();
+
         }
 
-        void RunWebServer()
-        {
-            // Wait for the network...
-            while (ethernetJ11D.IsNetworkUp == false)
-            {
-                Debug.Print("Waiting...");
-                Thread.Sleep(1000);
-            }
-        }
     }
 }
