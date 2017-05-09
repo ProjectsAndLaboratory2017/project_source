@@ -8,13 +8,12 @@ namespace WebServiceWCF.Model
     public class Receipt
     {
         // TODO consider Customer
-        public string CustomerId { get; private set; }
+        public string CustomerId { get; set; }
         // TODO consider Dictionary<Product, int>
-        public Dictionary<string, int> Items { get; private set; }
+        public Dictionary<string, int> Items { get; set; }
 
-        public Receipt(string customerId)
+        public Receipt()
         {
-            CustomerId = customerId;
             Items = new Dictionary<string, int>();
         }
     }

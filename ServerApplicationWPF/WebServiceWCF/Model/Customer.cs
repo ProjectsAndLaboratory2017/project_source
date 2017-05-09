@@ -24,7 +24,7 @@ namespace WebServiceWCF.Model
 
         public string Serialize()
         {
-            return "{\"id\": " + CustomerId + ", \"name\": \"" + Name + "\", \"surname\": " + Surname + " }";
+            return "{\"id\": " + CustomerId + ", \"name\": \"" + Name + "\", \"surname\": \"" + Surname + "\" }";
         }
     }
 }

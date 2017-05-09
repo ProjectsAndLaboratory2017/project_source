@@ -61,9 +61,12 @@ namespace ServerApplicationWPF.UDPNetwork
             }
             byte[] result = new byte[toRead];
             int start_offset = 0;
+            int n_packets = 0;
+            int toread_orig = toRead;
             while (toRead > 0)
             {
                 datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
+                n_packets++;
                 TokenAndData data_parsed = new TokenAndData(datagram);
                 if (data_parsed.Token != token)
                 {

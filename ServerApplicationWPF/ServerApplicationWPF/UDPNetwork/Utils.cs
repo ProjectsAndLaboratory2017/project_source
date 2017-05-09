@@ -9,7 +9,7 @@ namespace ServerApplicationWPF.UDPNetwork
         // never want fragmentation: MTU = 1500 usually
         // IP header = 20
         // UDP header = 8
-        public static int DGRAM_MAX_SIZE = 1472;
+        public static int DGRAM_MAX_SIZE = 1000;
         public static int CHUNK_SIZE = DGRAM_MAX_SIZE - sizeof(int);
         public static string TOKEN_REQUEST = "give_me_a_token";
         public static string ACK = "ack";

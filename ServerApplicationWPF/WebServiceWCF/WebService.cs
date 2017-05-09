@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -11,19 +12,19 @@ namespace WebServiceWCF
     public class WebService : IHttpHandler
     {
         private Database.DataManager dataManager;
-        private ImageScan.CodeScanner codeScanner;
+        private ImageScan.CodeProjectWrapper codeScanner;
         public bool IsReusable { get { return false; } }
 
         public WebService()
         {
             dataManager = new Database.DataManager();
-            codeScanner = new ImageScan.CodeScanner();
+            codeScanner = new ImageScan.CodeProjectWrapper();
         }
 
         public void ProcessRequest(HttpContext context)
         {
             String path = context.Request.Path;
-            // compare URI to resource templates and find match
+            context.Response.ContentType = "application/json";
 
             // figure out which HTTP method is being used
             switch (context.Request.HttpMethod)
@@ -31,7 +32,15 @@ namespace WebServiceWCF
                 // dispatch to internal methods based on URI and HTTP method
                 // and write the correct response status & entity body
                 case "GET":
-                    HttpContext.Current.Response.Write("Hi there! The service is up and running");
+                    if (path == "/users")
+                    {
+                        // TODO find a match with pathParam
+                        context.Response.Write(new Model.Customer("1", "ciao", "ciao", "ciao", "ciao"));
+                    }
+                    else
+                    {
+                        HttpContext.Current.Response.Write("Hi there! The service is up and running");
+                    }
                     break;
                 case "POST":
                     if (path == "/barcode/recognize")
@@ -42,6 +51,7 @@ namespace WebServiceWCF
                         {
                             case ImageScan.ScanResult.ResultType.None:
                                 // TODO
+                                context.Response.Write("image without barcode");
                                 break;
                             case ImageScan.ScanResult.ResultType.Barcode:
                                 // TODO a product
@@ -78,6 +88,7 @@ namespace WebServiceWCF
                     }
                     else if (path == "/receipts")
                     {
+                        //Model.Receipt receipt = JsonConvert.DeserializeObject<Model.Receipt>();
                         /*HttpContext.Current.Response.Write("You want to store a receipt");
                         Model.Receipt receipt = parseReceipt(context);
                         dataManager.InsertReceipt(receipt);
