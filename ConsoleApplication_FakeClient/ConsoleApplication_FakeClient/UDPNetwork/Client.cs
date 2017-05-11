@@ -16,7 +16,7 @@ namespace ConsoleApplication_FakeClient.UDPNetwork
         public int AskToken()
         {
             byte[] req = Utils.StringToBytes("I want a token");
-            TokenAndData reqTD = new TokenAndData(0, req);
+            TokenAndData reqTD = new TokenAndData(0, 0, req);
             try
             {
                 socket.Send(reqTD.Serialized);

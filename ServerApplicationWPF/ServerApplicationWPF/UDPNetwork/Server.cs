@@ -38,7 +38,7 @@ namespace ServerApplicationWPF.UDPNetwork
 
             int token = randomGenerator.Next();
 
-            TokenAndData response_token = new TokenAndData(0, BitConverter.GetBytes(token));
+            TokenAndData response_token = new TokenAndData(0, 0, BitConverter.GetBytes(token));
             socket.SendTo(response_token.Serialized, remoteEndpoint);
 
             valid = true;
