@@ -54,7 +54,8 @@ namespace ServerApplicationWPF
                 // show the image
                 this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new ImageConsumer(displayImage), image2);
                 // do the barcode scan
-                //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
+                ArrayList barcodes = new ArrayList();
+                BarcodeScanner.FullScanPage(ref barcodes, image, 100);
                 //messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
                 string result = codeScanner.ScanPage(image);
                 messageProcessing("Scan done. Found: " + result);
