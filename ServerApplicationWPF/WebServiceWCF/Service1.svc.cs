@@ -1,33 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.ServiceModel;
 using System.ServiceModel.Web;
-using System.Text;
 
 namespace WebServiceWCF
 {
-    // NOTA: è possibile utilizzare il comando "Rinomina" del menu "Refactoring" per modificare il nome di classe "Service1" nel codice, nel file svc e nel file di configurazione contemporaneamente.
-    // NOTA: per avviare il client di prova WCF per testare il servizio, selezionare Service1.svc o Service1.svc.cs in Esplora soluzioni e avviare il debug.
     public class Service1 : IService1
     {
-        public string GetData(int value)
+        [WebInvoke(Method = "GET",
+                    ResponseFormat = WebMessageFormat.Json,
+                    UriTemplate = "data/{id}")]
+        public Person GetData(string id)
         {
-            return string.Format("You entered: {0}", value);
+            // lookup person with the requested id 
+            return new Person()
+            {
+                Id = Convert.ToInt32(id),
+                Name = "Leo Messi"
+            };
         }
+    }
 
-        public CompositeType GetDataUsingDataContract(CompositeType composite)
-        {
-            if (composite == null)
-            {
-                throw new ArgumentNullException("composite");
-            }
-            if (composite.BoolValue)
-            {
-                composite.StringValue += "Suffix";
-            }
-            return composite;
-        }
+    public class Person
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }

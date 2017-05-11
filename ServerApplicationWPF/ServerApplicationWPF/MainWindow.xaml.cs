@@ -54,7 +54,8 @@ namespace ServerApplicationWPF
                 // show the image
                 this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new ImageConsumer(displayImage), image2);
                 // do the barcode scan
-                //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
+                ArrayList barcodes = new ArrayList();
+                BarcodeScanner.FullScanPage(ref barcodes, image, 100);
                 //messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
                 string result = codeScanner.ScanPage(image);
                 messageProcessing("Scan done. Found: " + result);
@@ -74,11 +75,11 @@ namespace ServerApplicationWPF
                         // this is a product
                         // TODO search product in DB
                     }
-                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.ASCII.GetBytes(result));
+                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(result));
                 }
                 else
                 {
-                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, new byte[0]);
+                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("I have found no images"));
                 }
                 return response;
             }
