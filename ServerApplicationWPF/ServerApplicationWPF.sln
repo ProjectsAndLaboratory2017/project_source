@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerApplicationWPF", "ServerApplicationWPF\ServerApplicationWPF.csproj", "{F900B98A-7A30-4D45-B49F-C15AD8AE8A42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServiceWCF", "WebServiceWCF\WebServiceWCF.csproj", "{B1103B73-763A-45BE-AF8D-AF6DF4A864C2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{F900B98A-7A30-4D45-B49F-C15AD8AE8A42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F900B98A-7A30-4D45-B49F-C15AD8AE8A42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F900B98A-7A30-4D45-B49F-C15AD8AE8A42}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B1103B73-763A-45BE-AF8D-AF6DF4A864C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1103B73-763A-45BE-AF8D-AF6DF4A864C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1103B73-763A-45BE-AF8D-AF6DF4A864C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1103B73-763A-45BE-AF8D-AF6DF4A864C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
