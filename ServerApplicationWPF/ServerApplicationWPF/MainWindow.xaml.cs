@@ -56,12 +56,13 @@ namespace ServerApplicationWPF
                 // do the barcode scan
                 ArrayList barcodes = new ArrayList();
                 BarcodeScanner.FullScanPage(ref barcodes, image, 100);
-                //messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
-                string result = codeScanner.ScanPage(image);
-                messageProcessing("Scan done. Found: " + result);
+                messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
+                //string result = codeScanner.ScanPage(image);
+                
                 NetworkResponse response;
-                if (result != null)
+                if (barcodes.Count > 0)
                 {
+                    /*
                     string qrCode = getQr(result);
                     // check if it was a qrCode
                     if (qrCode != null)
@@ -74,11 +75,14 @@ namespace ServerApplicationWPF
                         string productID = getProductID(result);
                         // this is a product
                         // TODO search product in DB
-                    }
+                    }*/
+                    string result = (string)barcodes[0];
+                    messageProcessing("Scan done. Found: " + result);
                     response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(result));
                 }
                 else
                 {
+                    messageProcessing("No barcodes found");
                     response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("I have found no images"));
                 }
                 return response;
