@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Collections;
 using ServerApplicationWPF.Model;
+using ZXing;
 
 namespace ServerApplicationWPF
 {
@@ -27,7 +28,7 @@ namespace ServerApplicationWPF
     {
         private NetworkDriver networkDriver;
         private CodeScanner codeScanner;
-        private DBConnect dbConnect;
+        private DataManager dbConnect;
 
         private delegate void StringConsumer(string s);
         private delegate void ImageConsumer(Bitmap image);
@@ -36,7 +37,7 @@ namespace ServerApplicationWPF
             InitializeComponent();
             codeScanner = new CodeScanner();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
-            dbConnect = new DBConnect();
+            dbConnect = new DataManager();
         }
 
         private void messageProcessing(string message)
@@ -55,12 +56,14 @@ namespace ServerApplicationWPF
                 this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new ImageConsumer(displayImage), image2);
                 // do the barcode scan
                 ArrayList barcodes = new ArrayList();
-                BarcodeScanner.FullScanPage(ref barcodes, image, 100);
+                //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
+                IBarcodeReader reader = new BarcodeReader();
+                var result = reader.Decode(image);
                 messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
                 //string result = codeScanner.ScanPage(image);
                 
                 NetworkResponse response;
-                if (barcodes.Count > 0)
+                if (result != null)
                 {
                     /*
                     string qrCode = getQr(result);
@@ -76,14 +79,23 @@ namespace ServerApplicationWPF
                         // this is a product
                         // TODO search product in DB
                     }*/
-                    string result = (string)barcodes[0];
+                    string textResult = result.Text;
                     messageProcessing("Scan done. Found: " + result);
-                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(result));
+                    Product p = dbConnect.getProductByBarcode(textResult);
+                    if (p == null)
+                    {
+                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("No product with this barcode"));
+                    } else
+                    {
+                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(p.Name));
+                    }
+                    
+                    
                 }
                 else
                 {
                     messageProcessing("No barcodes found");
-                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("I have found no images"));
+                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("I have found no barcode"));
                 }
                 return response;
             }

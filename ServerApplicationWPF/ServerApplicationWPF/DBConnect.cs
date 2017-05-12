@@ -2,7 +2,7 @@
 using ServerApplicationWPF.Model;
 using System.Collections.Generic;
 
-class DBConnect
+class DataManager
 {
     private MySqlConnection connection;
     private string server;
@@ -11,7 +11,7 @@ class DBConnect
     private string password;
 
     //Constructor
-    public DBConnect()
+    public DataManager()
     {
         Initialize();
     }
@@ -103,9 +103,9 @@ class DBConnect
                 quantity.Value = item.Value;
 
                 //Execute command
-                cmd.ExecuteNonQuery();        
+                cmd.ExecuteNonQuery();
             }
-            
+
             //close connection
             this.CloseConnection();
         }
@@ -130,7 +130,50 @@ class DBConnect
 
             //Read the data and store them in the list
             dataReader.Read();
-            Product result = new Product(dataReader["ProductID"] + "", dataReader["Barcode"] + "", dataReader["Name"] + "", double.Parse(dataReader["Price"] + ""), int.Parse(dataReader["points"] + ""));
+            Product result = null;
+            if (dataReader.HasRows)
+            {
+                result = new Product(dataReader["ProductID"] + "", dataReader["Barcode"] + "", dataReader["Name"] + "", double.Parse(dataReader["Price"] + ""), int.Parse(dataReader["points"] + ""));
+            }
+
+            //close Data Reader
+            dataReader.Close();
+
+            //close Connection
+            this.CloseConnection();
+
+            //return list to be displayed
+            return result;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public Customer getCustomerByBarcode(string barcode)
+    {
+        string query = "SELECT * FROM customer where barcode=@text";
+
+        //Open connection
+        if (this.OpenConnection() == true)
+        {
+            //Create Command
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            //prepare the statement to avoid SQL injection
+            cmd.Prepare();
+            // put parameter
+            cmd.Parameters.AddWithValue("@text", barcode);
+            //Create a data reader and Execute the command
+            MySqlDataReader dataReader = cmd.ExecuteReader();
+
+            //Read the data and store them in the list
+            dataReader.Read();
+            Customer result = null;
+            if (dataReader.HasRows)
+            {
+                result = new Customer(dataReader["CustomerID"] + "", dataReader["Barcode"] + "", dataReader["FirstName"] + "", dataReader["LastName"] + "", dataReader["Email"] + "");
+            }
 
             //close Data Reader
             dataReader.Close();
