@@ -74,9 +74,9 @@ namespace BoardApplication
 
              camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured); 
              button.ButtonPressed += new Button.ButtonEventHandler(button_ButtonPressed);
-             Thread.Sleep(1000);
-             IPEndPoint IPaddress = new IPEndPoint(IPAddress.Parse("192.168.1.1"), 8000);
-             client = new Client(IPaddress);
+             
+             
+            
            
 
             Debug.Print("Program Started");
@@ -331,6 +331,7 @@ namespace BoardApplication
            client.SendData(result,token);
 
            byte[] receivedMessage = client.ReceiveData(token);
+            Debug.Print(Utils.BytesToString(receivedMessage));
         }
         
 
@@ -349,8 +350,8 @@ namespace BoardApplication
         {
             Debug.Print("Network is up!");
             Debug.Print("My IP is: " + ethernetJ11D.NetworkSettings.IPAddress);
-            ethernetJ11D.NetworkInterface.Open();
-
+            IPEndPoint IPaddress = new IPEndPoint(IPAddress.Parse("192.168.1.1"), 8000);
+            client = new Client(IPaddress);
         }
 
     }
