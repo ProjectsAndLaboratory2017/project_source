@@ -19,6 +19,11 @@ namespace BoardApplication
             TokenAndData reqTD = new TokenAndData(0, 0, req);
             try
             {
+                // cleanup all the incoming packets
+                while (socket.Poll(0, SelectMode.SelectRead))
+                {
+                    byte[] stuff = Utils.Receive(socket);
+                }
                 socket.Send(reqTD.Serialized);
                 socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
                 byte[] res = Utils.Receive(socket);
