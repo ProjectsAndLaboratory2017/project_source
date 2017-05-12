@@ -36,24 +36,31 @@ namespace BoardApplication
                 toSend -= send_now;
                 start_offset += send_now;
                 string ack_string = Utils.NACK;
-                // create the datagram content: token followed by a chunk of data
+                int retry = Utils.MAX_RETRY;
                 do
                 {
                     try
                     {
+                        // create the datagram content: token followed by a chunk of data
                         TokenAndData dgram = new TokenAndData(token, sequenceNumber, buff);
                         sent = socket.SendTo(dgram.Serialized, remoteEndpoint);
 
                         // now wait for the ACK a limited time
-                        socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
+                        socket.ReceiveTimeout = Utils.FRAGMENT_TIMEOUT;
                         byte[] datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
                         TokenAndData response_parsed = new TokenAndData(datagram);
                         if (response_parsed.Token != token)
                         {
+                            retry = 0;
                             throw new Exception("The server answered with another token: " + response_parsed.Token);
                         }
                         if (response_parsed.SequenceNumber != sequenceNumber)
                         {
+                            if (response_parsed.SequenceNumber < sequenceNumber)
+                            {
+                                // already received
+                                continue;
+                            }
                             throw new Exception("The server answered with a wrong sequence number " + response_parsed.SequenceNumber);
                         }
                         ack_string = Utils.BytesToString(response_parsed.Data);
@@ -62,9 +69,14 @@ namespace BoardApplication
                     {
                         //
                     }
-
-                } while (ack_string != Utils.ACK);
-
+                    retry--;
+                } while (ack_string != Utils.ACK && retry > 0);
+                if (retry <= 0)
+                {
+                    throw new Exception("Max number of trials reached");
+                }
+                // put again retry to max value because transmission succeeded
+                retry = Utils.MAX_RETRY;
                 sequenceNumber++;
             }
 
@@ -88,6 +100,9 @@ namespace BoardApplication
             int n_packets = 0;
             int toread_orig = toRead;
             sequenceNumber++;
+            // switch to aggressive mode
+            socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
+            int retry = Utils.MAX_RETRY;
             while (toRead > 0)
             {
                 try
@@ -97,10 +112,19 @@ namespace BoardApplication
                     TokenAndData data_parsed = new TokenAndData(datagram);
                     if (data_parsed.Token != token)
                     {
+                        retry = 0;
                         throw new Exception("Wrong token: " + dgram_parsed.Token);
                     }
                     if (data_parsed.SequenceNumber != sequenceNumber)
                     {
+                        if (data_parsed.SequenceNumber < sequenceNumber)
+                        {
+                            // already received
+                            // send anyway ack (maybe lost it before)
+                            TokenAndData nack = new TokenAndData(token, data_parsed.SequenceNumber, Utils.StringToBytes(Utils.ACK));
+                            socket.SendTo(nack.Serialized, remoteEndpoint);
+                            continue;
+                        }
                         throw new Exception("Wrong sequence number " + dgram_parsed.SequenceNumber);
                     }
                     Array.Copy(data_parsed.Data, 0, result, start_offset, data_parsed.Data.Length);
@@ -115,10 +139,14 @@ namespace BoardApplication
                 {
                     // some exception (wrong token or timeout expired)
                     // ask again for the same fragment
+                    retry--;
                     TokenAndData nack = new TokenAndData(token, sequenceNumber, Utils.StringToBytes(Utils.NACK));
                     socket.SendTo(nack.Serialized, remoteEndpoint);
                 }
-
+                if (retry <= 0)
+                {
+                    throw new Exception("Max number of trials reached");
+                }
             }
 
             return result;

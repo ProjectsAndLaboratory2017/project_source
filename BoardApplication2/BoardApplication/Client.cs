@@ -20,6 +20,7 @@ namespace BoardApplication
             try
             {
                 socket.Send(reqTD.Serialized);
+                socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
                 byte[] res = Utils.Receive(socket);
                 TokenAndData resTD = new TokenAndData(res);
                 if (resTD.Token != 0)
