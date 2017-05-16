@@ -101,7 +101,7 @@ namespace ServerApplicationWPF.UDPNetwork
             int toread_orig = toRead;
             sequenceNumber++;
             // switch to aggressive mode
-            socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
+            socket.ReceiveTimeout = Utils.FRAGMENT_TIMEOUT;
             int retry = Utils.MAX_RETRY;
             while (toRead > 0)
             {
@@ -139,7 +139,7 @@ namespace ServerApplicationWPF.UDPNetwork
                 {
                     // some exception (wrong token or timeout expired)
                     // ask again for the same fragment
-                    retry--;
+                    //retry--;
                     TokenAndData nack = new TokenAndData(token, sequenceNumber, Utils.StringToBytes(Utils.NACK));
                     socket.SendTo(nack.Serialized, remoteEndpoint);
                 }
