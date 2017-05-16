@@ -59,9 +59,16 @@ namespace ServerApplicationWPF
                 //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
                 IBarcodeReader reader = new BarcodeReader();
                 var result = reader.Decode(image);
-                messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
+
                 //string result = codeScanner.ScanPage(image);
-                
+                int rotation = 0;
+                while (result == null && rotation < 4)
+                {
+                    image = rotateImage90(image);
+                    result = reader.Decode(image);
+                    rotation++;
+                }
+                messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
                 NetworkResponse response;
                 if (result != null)
                 {
@@ -151,6 +158,17 @@ namespace ServerApplicationWPF
         {
             Product product = dbConnect.getProductByBarcode(barcode_txt.Text);
             db_output.Text = product.toString();
+        }
+
+        private Bitmap rotateImage90(Bitmap b)
+        {
+            Bitmap returnBitmap = new Bitmap(b.Height, b.Width);
+            Graphics g = Graphics.FromImage(returnBitmap);
+            g.TranslateTransform((float)b.Width / 2, (float)b.Height / 2);
+            g.RotateTransform(90);
+            g.TranslateTransform(-(float)b.Width / 2, -(float)b.Height / 2);
+            g.DrawImage(b, new System.Drawing.Point(0, 0));
+            return returnBitmap;
         }
     }
 }
