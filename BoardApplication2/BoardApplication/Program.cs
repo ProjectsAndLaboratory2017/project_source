@@ -19,6 +19,7 @@ using System.Text;
 using Gadgeteer.Networking;
 using GT = Gadgeteer;
 using GTM = Gadgeteer.Modules;
+using Json.NETMF;
 
 namespace BoardApplication
 {
@@ -33,7 +34,7 @@ namespace BoardApplication
         private Image imgButton;
         private Boolean flagButtonPressHere = false;
         private Window window;
-        private ArrayList l = new ArrayList();
+        private Hashtable l = new Hashtable();
         private int flagThread = 0;
         private HttpWebRequest clientReq;
         private int WindowGlod = 0;
@@ -255,9 +256,11 @@ namespace BoardApplication
             int top = 30;
             int left = 30;
             int i;
-            for (i = 0; i < l.Count; i++)
-            {
-                txtMessage = new Text(baseFont, l[i].ToString());
+            foreach (DictionaryEntry d in l)
+            {          
+                ProductInfo p = d.Value as ProductInfo;
+                String s = p.productName+" "+p.price+"$";
+                txtMessage = new Text(baseFont,s);
                 Canvas.SetTop(txtMessage, top);
                 Canvas.SetLeft(txtMessage, left);
                 canvas.Children.Add(txtMessage);
@@ -306,6 +309,32 @@ namespace BoardApplication
         {
             imgButton.Bitmap = pressedButton;
             flagButtonPressHere = true;
+            int i;
+
+            foreach (DictionaryEntry d in l)
+            {
+                ProductInfo p = d.Value as ProductInfo;
+                String productId = p.IDProduct;
+                String productName = p.productName;
+                Double price = p.price;
+                Double points = p.points;
+                Double qty = p.Qty;
+
+                Hashtable hashtable = new Hashtable();
+                
+                hashtable.Add("ID", productId);
+                hashtable.Add("Product_name", productName);
+                hashtable.Add("Price", price);
+                hashtable.Add("Points", points);
+                hashtable.Add("Qty", qty);
+                string json = JsonSerializer.SerializeObject(hashtable);
+
+                int token = client.AskToken();
+                byte[] productBytes = Encoding.UTF8.GetBytes(json);
+                client.SendData(productBytes, token);
+
+            }
+
         }
 
         void createWindowFour()
@@ -337,15 +366,37 @@ namespace BoardApplication
             //Debug.Print(Utils.BytesToString(receivedMessage));
            if (barcodeError == true)
            {
-               l.Remove("I have found no barcode");
+               l.Remove("Error");
                barcodeError = false;
            }
-           if (Utils.BytesToString(receivedMessage).Equals("I have found no barcode") || Utils.BytesToString(receivedMessage).Equals("No produt with this barcode"))
+           if (Utils.BytesToString(receivedMessage).Equals("Error"))
            {
                barcodeError = true;
            }
-           l.Add(Utils.BytesToString(receivedMessage));
+           else
+           {
+               Hashtable hashTable = JsonSerializer.DeserializeString(Utils.BytesToString(receivedMessage)) as Hashtable;
 
+
+               ProductInfo prod = new ProductInfo();
+               prod.IDProduct = hashTable["ID"] as String;
+               if (!l.Contains(prod.IDProduct))
+               {
+                   prod.productName = hashTable["Product_name"] as String;
+                   String priceString = hashTable["Price"] as String;
+                   prod.price = Double.Parse(priceString);
+                   String pointString = hashTable["Points"] as String;
+                   prod.points = Double.Parse(pointString);
+                   prod.Qty++;
+                   l.Add(prod.IDProduct, prod);
+               }
+               else
+               {
+                   (l[prod.IDProduct] as ProductInfo).Qty++;
+               }
+           }
+           
+           
            createWindowThree();
         }
         
