@@ -36,6 +36,8 @@ namespace BoardApplication
         private ArrayList l = new ArrayList();
         private int flagThread = 0;
         private HttpWebRequest clientReq;
+        private int WindowGlod = 0;
+        private Boolean barcodeError = false;
         
         // This method is run when the mainboard is powered up or reset.   
         void ProgramStarted()
@@ -125,8 +127,9 @@ namespace BoardApplication
             Canvas canvas = new Canvas();
             window.Child = canvas;
             window.Background = new SolidColorBrush(GT.Color.White);
+            WindowGlod = 1;
 
-
+            l.Clear();
             Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
 
             txtMessage = new Text(baseFont, "Welcome to the automatic cash.");
@@ -188,7 +191,7 @@ namespace BoardApplication
             Canvas.SetTop(imgButton, 110);
             Canvas.SetLeft(imgButton, 80);
             canvas.Children.Add(imgButton);
-
+            WindowGlod = 2;
             imgButton.TouchDown += new TouchEventHandler(imgButton_TouchDown2);
             imgButton.TouchUp += new TouchEventHandler(imgButton_TouchUp2);
 
@@ -223,7 +226,7 @@ namespace BoardApplication
             Canvas.SetLeft(txtMessage, 30);
             canvas.Children.Add(txtMessage);
 
-
+            WindowGlod = 3;
            
           //  Here I develop the communication in order to get the objects
        /*
@@ -331,14 +334,27 @@ namespace BoardApplication
            client.SendData(result,token);
 
            byte[] receivedMessage = client.ReceiveData(token);
-            Debug.Print(Utils.BytesToString(receivedMessage));
+            //Debug.Print(Utils.BytesToString(receivedMessage));
+           if (barcodeError == true)
+           {
+               l.Remove("I have found no barcode");
+               barcodeError = false;
+           }
+           if (Utils.BytesToString(receivedMessage).Equals("I have found no barcode") || Utils.BytesToString(receivedMessage).Equals("No produt with this barcode"))
+           {
+               barcodeError = true;
+           }
+           l.Add(Utils.BytesToString(receivedMessage));
+
+           createWindowThree();
         }
         
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
         {
            // tunes.Play(1100, 300);
-            camera.TakePicture();
+            if(WindowGlod==3)
+             camera.TakePicture();      
         }
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)

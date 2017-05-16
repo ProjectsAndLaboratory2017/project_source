@@ -23,6 +23,7 @@ namespace BoardApplication
                 while (socket.Poll(0, SelectMode.SelectRead))
                 {
                     byte[] stuff = Utils.Receive(socket);
+
                 }
                 socket.Send(reqTD.Serialized);
                 socket.ReceiveTimeout = Utils.RECEIVE_TIMEOUT;
