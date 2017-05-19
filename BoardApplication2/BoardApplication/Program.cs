@@ -310,30 +310,24 @@ namespace BoardApplication
             imgButton.Bitmap = pressedButton;
             flagButtonPressHere = true;
             int i;
-
+            
+            ArrayList list = new ArrayList();
             foreach (DictionaryEntry d in l)
             {
                 ProductInfo p = d.Value as ProductInfo;
                 String productId = p.IDProduct;
-                String productName = p.productName;
-                Double price = p.price;
-                Double points = p.points;
+               
                 Double qty = p.Qty;
-
                 Hashtable hashtable = new Hashtable();
                 
-                hashtable.Add("ID", productId);
-                hashtable.Add("Product_name", productName);
-                hashtable.Add("Price", price);
-                hashtable.Add("Points", points);
+                hashtable.Add("ID",productId);
                 hashtable.Add("Qty", qty);
-                string json = JsonSerializer.SerializeObject(hashtable);
-
-                int token = client.AskToken();
-                byte[] productBytes = Encoding.UTF8.GetBytes(json);
-                client.SendData(productBytes, token);
-
+                list.Add(hashtable); 
             }
+            string json = JsonSerializer.SerializeObject(list);
+            int token = client.AskToken();
+            byte[] productBytes = Encoding.UTF8.GetBytes(json);
+            client.SendData(productBytes, token);
 
         }
 
@@ -361,6 +355,7 @@ namespace BoardApplication
           //  client.sendBytes(result);
            int token = client.AskToken();
            client.SendData(result,token);
+           
 
            byte[] receivedMessage = client.ReceiveData(token);
             //Debug.Print(Utils.BytesToString(receivedMessage));
