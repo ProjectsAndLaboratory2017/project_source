@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -84,10 +85,18 @@ namespace ServerApplicationWPF
 
             try
             {
-                // TODO For now, only request for images
-                type = NetworkRequest.RequestType.ImageProcessingRequest;
-
                 payload = server.ReceiveData(token);
+                string req = UDPNetwork.Utils.BytesToString(payload);
+                try
+                {
+                    JsonConvert.DeserializeObject(req);
+                    type = NetworkRequest.RequestType.ReceiptStorageRequest;
+                }
+                catch (JsonException e)
+                {
+                    type = NetworkRequest.RequestType.ImageProcessingRequest;
+                }
+                
             }
             catch (Exception e)
             {

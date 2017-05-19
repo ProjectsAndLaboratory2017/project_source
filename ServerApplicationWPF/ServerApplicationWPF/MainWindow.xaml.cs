@@ -91,10 +91,10 @@ namespace ServerApplicationWPF
                     Product p = dbConnect.getProductByBarcode(textResult);
                     if (p == null)
                     {
-                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("No product with this barcode"));
+                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("Error"));
                     } else
                     {
-                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(p.Name));
+                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("{\"ID\":\"" + p.ProductId + "\",\"Product_name\":\"" + p.Name + "\",\"Price\":\"" + p.Price + "\",\"Points\":\"" + p.Points + "\"}"));
                     }
                     
                     
@@ -102,7 +102,7 @@ namespace ServerApplicationWPF
                 else
                 {
                     messageProcessing("No barcodes found");
-                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("I have found no barcode"));
+                    response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("Error"));
                 }
                 return response;
             }
