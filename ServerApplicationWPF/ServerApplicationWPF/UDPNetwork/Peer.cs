@@ -69,7 +69,7 @@ namespace ServerApplicationWPF.UDPNetwork
                     {
                         //
                     }
-                    retry--;
+                    //retry--;
                 } while (ack_string != Utils.ACK && retry > 0);
                 if (retry <= 0)
                 {

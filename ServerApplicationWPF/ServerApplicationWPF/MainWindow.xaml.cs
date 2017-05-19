@@ -18,6 +18,8 @@ using System.IO;
 using System.Collections;
 using ServerApplicationWPF.Model;
 using ZXing;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ServerApplicationWPF
 {
@@ -68,7 +70,7 @@ namespace ServerApplicationWPF
                     result = reader.Decode(image);
                     rotation++;
                 }
-                messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
+                //messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
                 NetworkResponse response;
                 if (result != null)
                 {
@@ -91,9 +93,16 @@ namespace ServerApplicationWPF
                     Product p = dbConnect.getProductByBarcode(textResult);
                     if (p == null)
                     {
+                        messageProcessing("No products found");
                         response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("Error"));
                     } else
                     {
+                        System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+                        customCulture.NumberFormat.NumberDecimalSeparator = ".";
+
+                        System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
+                        messageProcessing("Product found: " + p.Name);
                         response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("{\"ID\":\"" + p.ProductId + "\",\"Product_name\":\"" + p.Name + "\",\"Price\":\"" + p.Price + "\",\"Points\":\"" + p.Points + "\"}"));
                     }
                     
@@ -109,6 +118,24 @@ namespace ServerApplicationWPF
             else if (request.requestType == NetworkRequest.RequestType.ReceiptStorageRequest)
             {
                 // TODO
+                string req = UDPNetwork.Utils.BytesToString(request.Payload);
+                JArray receipt = JArray.Parse(req);
+
+                IList<JToken> products = receipt.Children().ToList();
+
+                Receipt receiptObj = new Receipt("6");
+
+                foreach (var product in products)
+                {
+                    String id = product["ID"].ToString();
+                    String qty = product["Qty"].ToString();
+
+                    messageProcessing("product id: " + id + " qty: " + qty);
+
+                    receiptObj.Items.Add(id, int.Parse(qty));
+                }
+
+                dbConnect.InsertReceipt(receiptObj);
                 return null;
             }
             else
