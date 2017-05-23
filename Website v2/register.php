@@ -31,7 +31,7 @@ $error = false;
 if (isset ( $_POST ['signup'] )) {
 	$firstName = mysqli_real_escape_string ( $conn, $_POST ['firstName'] );
 	$lastName = mysqli_real_escape_string ( $conn, $_POST ['lastName'] );
-	$barcode = mysqli_real_escape_string ( $conn, $_POST ['barcode'] );
+//	$barcode = mysqli_real_escape_string ( $conn, $_POST ['barcode'] );
 	$email = mysqli_real_escape_string ( $conn, $_POST ['email'] );
 	$password = mysqli_real_escape_string ( $conn, $_POST ['password'] );
 	$confirmPassword = mysqli_real_escape_string ( $conn, $_POST ['confirmPassword'] );
@@ -44,9 +44,17 @@ if (isset ( $_POST ['signup'] )) {
 		$error = true;
 		$lastNameError = "Last Name must contain alphabets and/or digits only";
 	}
-	if (! preg_match ( "/^[0-9]{9}+$/", $barcode )) {
+/*	if (! preg_match ( "/^[0-9]{9}+$/", $barcode )) {
 		$error = true;
 		$barcodeError = "Barcode must be a 9 digit number";
+	}
+	*/
+	for ($i = 0; $i<9; $i++) 
+	{
+		if($i == 0)
+			$barcode = mt_rand(1,9);
+		else
+			$barcode .= mt_rand(0,9);
 	}
 	if (! preg_match ( "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/", $email )) {
 		$error = true;
@@ -62,6 +70,23 @@ if (isset ( $_POST ['signup'] )) {
 	}
 	
 	if (! $error) {
+		$barcode_query = "SELECT * FROM customer WHERE Barcode = '" . $barcode . "'";
+		$barcode_result = mysqli_query ( $conn, $barcode_query );
+		if (! $barcode_result) {
+			echo ("Unable to execute query: " . mysqli_error ( $conn ));
+			exit();
+		}
+		else{
+			if(mysqli_num_rows($barcode_result) > 0){
+				for ($i = 0; $i<9; $i++) {
+					if($i == 0)
+						$barcode = mt_rand(1,9);
+					else
+						$barcode .= mt_rand(0,9);
+				}
+			}
+		}
+		
 		$query = "SELECT * FROM customer WHERE Email = '" . $email . "'";
 		$result = mysqli_query ( $conn, $query );
 		if (! $result) {
@@ -74,7 +99,7 @@ if (isset ( $_POST ['signup'] )) {
 				if (! $result) {
 					$failure = "Error in Registering --- Please try again later!";
 				} else {
-					$success = "Congratulations! You have registered successfully. You can login now!";
+					$success = "Congratulations! You have registered successfully. Your barcode is " . $barcode . " You can login now!";
 				}
 			} else
 				$failure = "This email address is already registered!";
@@ -132,9 +157,9 @@ if (isset ( $_POST ['signup'] )) {
 							<input type="text" class="form-control" name="lastName" id="lastName" placeholder="Last Name" required="required" value="<?php if($error) echo stripslashes($lastName); ?>" />
 							<span class="text-danger"><?php if(isset($lastNameError)) echo $lastNameError; ?></span>
 							<br /> <br />
-							<input type="text" class="form-control" name="barcode" id="barcode" placeholder="Barcode" required="required" value="<?php if($error) echo stripslashes($barcode); ?>" />
-							<span class="text-danger"><?php if(isset($barcodeError)) echo $barcodeError; ?></span>
-							<br /> <br />
+							<!--input type="text" class="form-control" name="barcode" id="barcode" placeholder="Barcode" required="required" value="<?php // if($error) echo stripslashes($barcode); ?>" />
+							<span class="text-danger"><?php // if(isset($barcodeError)) echo $barcodeError; ?></span>
+							<br /> <br /-->
 							<input type="email" class="form-control" name="email" id="email" placeholder="Email" required="required" value="<?php if($error) echo stripslashes($email); ?>" />
 							<span class="text-danger"><?php if(isset($emailError)) echo $emailError; ?></span>
 							<br /> <br />

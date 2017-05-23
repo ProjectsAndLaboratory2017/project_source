@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 24, 2017 at 09:16 AM
+-- Generation Time: May 02, 2017 at 12:55 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 7.0.5
 
@@ -48,7 +48,18 @@ INSERT INTO `customer` (`CustomerID`, `Barcode`, `FirstName`, `LastName`, `Email
 (10, '876543210', 'Martino', 'Mensio', 'martino@gmail.com', '37ede6fa3d6089ba78da88aff24e1976', 0),
 (11, '789012345', 'Giuseppe', 'Carella', 'giuseppe@gmail.com', '353f9bfab2d01dbb1db343fdaf9ab02e', 0),
 (12, '111222333', 'Admin', 'Manager', 'msg@gmail.com', '6e2baaf3b97dbeef01c0043275f9a0e7', 0),
-(13, '333666999', 'Mario', 'Rossi', 'mariorossi@mario.it', 'de2f15d014d40b93578d255e6221fd60', 0);
+(13, '333666999', 'Mario', 'Rossi', 'mariorossi@mario.it', 'de2f15d014d40b93578d255e6221fd60', 0),
+(14, '813915968', 'Pirah', 'Noor', 'pirah@gmail.com', '065356e688e8ee2c0b635172007946a1', 0),
+(15, '805467570', 'Anam', 'Memon', 'anam@gmail.com', '80437b9dadf860bbf7bc9b469d506b9a', 0),
+(16, '844235867', 'farwa', 'bibi', 'farwa@gmail.com', '8c17c7cfa37688bcf36195432fdcc30d', 0),
+(17, '733513845', 'Fabiola', 'Polidoro', 'fabiola@gmail.com', 'e72925c5d1da0b8d82e1878bc777a2c9', 0),
+(18, '690830495', 'Fabiola', 'Polidoro', 'fabiola123@gmail.com', 'e72925c5d1da0b8d82e1878bc777a2c9', 0),
+(19, '531875489', 'Imran', 'Khan', 'imran@gmail.com', 'e18fdc9fa7cc2b5f4e497d21a48ea3b7', 0),
+(20, '199818570', 'Imran', 'Khan', 'imran123@gmail.com', 'e18fdc9fa7cc2b5f4e497d21a48ea3b7', 0),
+(21, '673586648', 'Sadhna', 'Asnani', 'sadhna@gmail.com', '5a51423dfbae1fb1acf85a3f776a8274', 0),
+(22, '351870011', 'Natasha', 'Asnani', 'natasha@gmail.com', '6275e26419211d1f526e674d97110e15', 0),
+(23, '908508116', 'Munesh', 'Kumar', 'munesh@gmail.com', '2d96315b4c57a3b4be4e81b97754f547', 0),
+(24, '173327235', 'Hitesh', 'Kumar', 'hitesh@gmail.com', '80e2235fd9a018996178a07a6a3f4fff', 0);
 
 -- --------------------------------------------------------
 
@@ -72,20 +83,21 @@ CREATE TABLE `product` (
 
 INSERT INTO `product` (`ProductID`, `Barcode`, `Name`, `Price`, `StoreQty`, `WarehouseQty`, `Points`) VALUES
 (1, '012345678', 'FEZ Spider II Mainboard', 15, 5, 20, 15),
-(2, '123456789', 'Display TE35 Module', 10, 2, 18, 12),
-(3, '234567890', 'USB Client EDP Module', 8, 1, 14, 5),
-(4, '345678901', '2x Button Module', 5, 1, 16, 3),
-(5, '456789012', 'Ethernet J11D Module', 9, 4, 1, 7),
+(2, '123456789', 'Display TE35 Module', 10, 10, 10, 12),
+(3, '234567890', 'USB Client EDP Module', 8, 10, 20, 5),
+(4, '345678901', '2x Button Module', 5, 10, 20, 3),
+(5, '456789012', 'Ethernet J11D Module', 9, 5, 20, 7),
 (6, '567890123', 'Joystick Module', 6, 9, 10, 3),
 (7, '678901234', 'LED Strip Module', 2, 16, 0, 3),
-(8, '789012345', 'Light Sensor Module', 7, 3, 15, 9),
+(8, '789012345', 'Light Sensor Module', 7, 10, 8, 9),
 (9, '890123456', 'SD Card Module', 14, 4, 30, 4),
 (10, '901234567', '128mb SD Card', 8, 5, 15, 7),
 (11, '123456781', 'Tune Module', 4, 10, 3, 1),
-(12, '234567822', 'USB Host Module', 9, 2, 10, 11),
-(13, '345678321', 'Holey Board', 6, 2, 19, 8),
-(14, '456784321', 'USB Cable', 2, 4, 2, 1),
-(15, '567812345', 'Reusable Plastic Storage Box', 5, 10, 9, 2);
+(12, '234567822', 'USB Host Module', 9, 10, 2, 11),
+(13, '345678321', 'Holey Board', 6, 10, 11, 8),
+(14, '456784321', 'USB Cable', 2, 6, 0, 1),
+(15, '567812345', 'Reusable Plastic Storage Box', 5, 10, 9, 2),
+(16, '344356782', 'Reusable Plastic Storage Box', 5.5, 10, 9, 2);
 
 -- --------------------------------------------------------
 
@@ -147,12 +159,12 @@ ALTER TABLE `receipt`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 --
 -- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
-  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 --
 -- AUTO_INCREMENT for table `receipt`
 --

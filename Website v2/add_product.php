@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 include 'dbconnect.php';
 include 'time_elapse.php';
@@ -29,7 +28,7 @@ if (isset ( $_POST ['addproduct'] )) {
 	$warehouseQty = mysqli_real_escape_string ( $conn, $_POST ['warehouseQty'] );
 	$points = mysqli_real_escape_string ( $conn, $_POST ['points'] );
 	
-	if (! preg_match ( "/^[a-zA-Z0-9 ]+$/", $productName )) {
+	if (! preg_match ( "/^[a-zA-Z0-9_ ]+$/", $productName )) {
 		$error = true;
 		$productNameError = "Product Name must contain alphabets and/or digits only";
 	}
@@ -40,36 +39,77 @@ if (isset ( $_POST ['addproduct'] )) {
 	
 	if (! $error) {
 		$query = "SELECT * FROM product WHERE Barcode = '" . $barcode . "'";
+		$query_name = "SELECT * FROM product WHERE Name = '" . $productName . "'";
+		
 		$result = mysqli_query ( $conn, $query );
-		if (! $result) {
+		$result_name = mysqli_query ( $conn, $query_name );
+		
+		if (! $result || !$result_name) {
 			echo ("Unable to execute query: " . mysqli_error ( $conn ));
 			exit();
 		} else {
 			if (! $row = mysqli_fetch_array ( $result )) {
-				$insert_query = "INSERT INTO product(Barcode, Name, Price, StoreQty, WarehouseQty, Points) VALUES('" . $barcode . "', '" . $productName . "', '" . $price . "', '" . $storeQty . "', '" . $warehouseQty . "', '" . $points . "')";
-				$result = mysqli_query ( $conn, $insert_query );
-				if (! $result) {
-					$failure = "Error in Registering --- Please try again later!";
-				} else {
-					$success = "A new product is entered successfully!";
-				}
+				if(! $row_name = mysqli_fetch_array ( $result_name )){
+					$insert_query = "INSERT INTO product(Barcode, Name, Price, StoreQty, WarehouseQty, Points) VALUES('" . $barcode . "', '" . $productName . "', '" . $price . "', '" . $storeQty . "', '" . $warehouseQty . "', '" . $points . "')";
+					$result = mysqli_query ( $conn, $insert_query );
+					if (! $result) {
+						$failure = "Error in Registering --- Please try again later!";
+					} else {
+						$success = "A new product is entered successfully!";
+					}
+				} else 
+					$failure = "Product with same name already exists!";
 			} else
-				$failure = "This product is already present!";
+				$failure = "Product with same Barcode already exists!";
 		}
 	}
 }
+
 ?>
 
 <!DOCTYPE html>
 <html>
+<head>
 
+<!-- Redirect to test_javaScript.php if javaScript is not enabled -->
+<!--<noscript> <meta http-equiv="refresh" content="0;url=test_javascript.php"> </noscript>-->
+
+<meta charset="ISO-8859-1">
+<title>Home</title>
+
+<!-------------------------- BootStrap Files ---------------------->
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<script src="js/jquery.js"></script>
+<script src="js/footer.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<!-------------------------- BootStrap Files ---------------------->
+
+</head>
 <body class="times-new-roman">
 	<div class="container-fluid">
+		<div class="row rm bg-primary">
+			<div class="col-md-8">
+				<h1><a class="header" href="index.php">electronics.com</a></h1>
+			</div>
+		<div class="col-md-4">
+			<span class="login-text pull-right"> 
+			<?php if (isset ( $_SESSION ['userId'] ) != "") { ?>
+					Logged in as <?php echo $_SESSION ['username'] . " | "; ?>
+					<a class="login-text" href='logout.php'>Logout</a>
+			<?php } ?>
+			</span>
+		</div>
+		</div>
 		<div class="row rm">
-			<div class="col-md-10">
-				<div class="col-md-2"></div>
-				<div class="col-md-6">
-					<h1 class="text-primary">Add Product</h1>
+			<div class="col-md-4">
+				<br /> <br /> <br />
+				<a class="btn btn-success btn-text" href="home_manager.php">Back to Home</a> 
+				<br /> <br />
+				<!--a class="btn btn-success btn-text" href="all_reservations.php">Show All Reservations</a-->
+			</div>
+			<div class="col-md-4">	
+				<h1 class="text-primary">Add Product</h1>
 					<br /> <br />
 					<form name="addproductform" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 						<div class="form-group">
@@ -95,7 +135,7 @@ if (isset ( $_POST ['addproduct'] )) {
 							<br /> <br />
 							
 							
-							<input type="submit" class="btn btn-success btn-text" name="addproduct" value="Add Product">
+							<input type="submit" class="btn btn-success btn-text" name="addproduct" value="Add">
 							<br /> <br />
 						</div>
 					</form>
@@ -105,11 +145,15 @@ if (isset ( $_POST ['addproduct'] )) {
 						elseif(isset($failure))
 							echo "<script type='text/javascript'> alert('$failure') </script>";
 					?>
-					</div>
-					<div class="col-md-2"></div>
+			</div>
+			<div class="col-md-4"></div>
+		</div>
+		<div class="row rm">
+			<div class="footer bg-primary" id="footer">
+				<br />
+				<p>Copyrights @ All rights are reserved by MSG Team, 2017</p>
 			</div>
 		</div>
-			
 	</div>
 </body>
 </html>
