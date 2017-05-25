@@ -23,5 +23,10 @@ namespace ServerApplicationWPF.Model
             Surname = surname;
             Email = email;
         }
+
+        public override string ToString()
+        {
+            return "{\"ID\":\"" + CustomerId + "\",\"Name\":\"" + Name + "\",\"Surname\":\"" + Surname + "\",\"Email\":\"" + Email + "\"}";
+        }
     }
 }

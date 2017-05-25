@@ -75,39 +75,40 @@ namespace ServerApplicationWPF
                 NetworkResponse response;
                 if (result != null)
                 {
-                    /*
-                    string qrCode = getQr(result);
-                    // check if it was a qrCode
-                    if (qrCode != null)
+                    if (result.BarcodeFormat == BarcodeFormat.QR_CODE)
                     {
-                        // this is a user ID
-                        // TODO search user in DB
+                        // this is a user
+                        string textResult = result.Text;
+                        messageProcessing("Scan done. Found QR code: " + result);
+                        Customer c = dbConnect.getCustomerByBarcode(textResult);
+                        if (c == null)
+                        {
+                            messageProcessing("No user found with this barcode");
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("Error"));
+                        }
+                        else
+                        {
+                            messageProcessing("User found: " + c.Email);
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(c.ToString()));
+                        }
                     }
                     else
                     {
-                        string productID = getProductID(result);
-                        // this is a product
-                        // TODO search product in DB
-                    }*/
-                    string textResult = result.Text;
-                    messageProcessing("Scan done. Found: " + result);
-                    Product p = dbConnect.getProductByBarcode(textResult);
-                    if (p == null)
-                    {
-                        messageProcessing("No products found");
-                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("Error"));
-                    } else
-                    {
-                        System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
-                        customCulture.NumberFormat.NumberDecimalSeparator = ".";
-
-                        System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-
-                        messageProcessing("Product found: " + p.Name);
-                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("{\"ID\":\"" + p.ProductId + "\",\"Product_name\":\"" + p.Name + "\",\"Price\":\"" + p.Price + "\",\"Points\":\"" + p.Points + "\"}"));
+                        // this should be a product
+                        string textResult = result.Text;
+                        messageProcessing("Scan done. Found: " + result);
+                        Product p = dbConnect.getProductByBarcode(textResult);
+                        if (p == null)
+                        {
+                            messageProcessing("No products found");
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("Error"));
+                        }
+                        else
+                        {
+                            messageProcessing("Product found: " + p.Name);
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(p.ToString()));
+                        }
                     }
-                    
-                    
                 }
                 else
                 {
@@ -120,11 +121,12 @@ namespace ServerApplicationWPF
             {
                 // TODO
                 string req = UDPNetwork.Utils.BytesToString(request.Payload);
-                JArray receipt = JArray.Parse(req);
-
-                IList<JToken> products = receipt.Children().ToList();
-
-                Receipt receiptObj = new Receipt("6");
+                JObject receipt = JObject.Parse(req);
+                String userId = receipt["UserID"].ToString();
+                JArray list = receipt["List"] as JArray;
+                IList<JToken> products = list.Children().ToList();
+                // TODO get customer id
+                Receipt receiptObj = new Receipt(userId);
 
                 foreach (var product in products)
                 {
@@ -137,6 +139,7 @@ namespace ServerApplicationWPF
                 }
 
                 dbConnect.InsertReceipt(receiptObj);
+                // TODO return ok to the board
                 return null;
             }
             else
@@ -186,7 +189,7 @@ namespace ServerApplicationWPF
         private void button_Click(object sender, RoutedEventArgs e)
         {
             Product product = dbConnect.getProductByBarcode(barcode_txt.Text);
-            db_output.Text = product.toString();
+            db_output.Text = product.Name;
         }
 
         private Bitmap rotateImage90(Bitmap b)

@@ -31,6 +31,11 @@ namespace ServerApplicationWPF
         }
         private void start_listener(object obj)
         {
+            // set the dot separator for floats
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
             UDPNetwork.Server server = new UDPNetwork.Server(8000);
 
             //accept a client
