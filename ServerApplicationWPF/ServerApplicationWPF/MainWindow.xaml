@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerApplicationWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="720" Closed="Window_Closed">
-    <Grid Background="#FF7985FF">
-        <ScrollViewer Name="MyScrollViewer" Margin="0,166,0,0" Height="150" VerticalAlignment="Bottom">
-            <TextBlock x:Name="Log" TextWrapping="Wrap" Background="#FFBAD9FF"/>
+        Title="Server Application" Height="400" Width="720" Closed="Window_Closed" Icon="Resources/shop-cash-register-icon-87069.png" MinHeight="300" MinWidth="500">
+    <Grid Background="#FF2BA842">
+        <ScrollViewer Name="MyScrollViewer" Margin="0,250,0,0">
+            <TextBlock x:Name="Log" TextWrapping="Wrap" Background="#FFAEAEAE"/>
         </ScrollViewer>
         <Image x:Name="ImageDisplay" HorizontalAlignment="Left" VerticalAlignment="Top" Width="320" Height="198" />
-        <TextBox x:Name="barcode_txt" HorizontalAlignment="Left" Height="24" Margin="500,34,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="625,38,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
-        <TextBlock x:Name="db_output" HorizontalAlignment="Left" Margin="500,63,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <TextBox x:Name="barcode_txt" HorizontalAlignment="Right" Height="24" Margin="0,9,92,0" TextWrapping="Wrap" Text="Search barcode" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="button" Content="Button" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <TextBlock x:Name="db_output" HorizontalAlignment="Right" Margin="0,38,92,0" TextWrapping="Wrap" Text="Product name" VerticalAlignment="Top" Background="#FFBFBFBF" Height="21" Width="119"/>
     </Grid>
 </Window>

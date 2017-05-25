@@ -40,6 +40,7 @@ namespace ServerApplicationWPF
             codeScanner = new CodeScanner();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
             dbConnect = new DataManager();
+            Console.WriteLine("ciao");
         }
 
         private void messageProcessing(string message)
@@ -169,6 +170,7 @@ namespace ServerApplicationWPF
             try
             {
                 Log.Text += "\n" + message;
+                MyScrollViewer.ScrollToBottom();
             }
             catch (Exception e)
             {
