@@ -39,7 +39,9 @@ namespace BoardApplication
         private HttpWebRequest clientReq;
         private int WindowGlod = 0;
         private Boolean barcodeError = false;
-        
+        private GT.Picture picture;
+        private UserInfo user;
+        private Boolean globalAuth = false;
         // This method is run when the mainboard is powered up or reset.   
         void ProgramStarted()
         {
@@ -73,15 +75,9 @@ namespace BoardApplication
                  Thread.Sleep(250);
              }
 
-          
-
-             camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured); 
-             button.ButtonPressed += new Button.ButtonEventHandler(button_ButtonPressed);
-             
-             
-            
-           
-
+            camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured); 
+            button.ButtonPressed += new Button.ButtonEventHandler(button_ButtonPressed);
+                          
             Debug.Print("Program Started");
 
             //welcome tune
@@ -96,6 +92,7 @@ namespace BoardApplication
 
             window = displayTE35.WPFWindow;
 
+            
             createWindowOne();
          
         }
@@ -123,6 +120,7 @@ namespace BoardApplication
         //FIRST WINDOW
         void createWindowOne()
         {
+            user = null;
             byte[] normalButtonByte;
             byte[] pressedButtonByte;
             Canvas canvas = new Canvas();
@@ -164,38 +162,35 @@ namespace BoardApplication
         //SECOND WINDOW
         void createWindowTwo()
         {
+            WindowGlod = 2;
             Canvas canvas = new Canvas();
             window.Child = canvas;
             Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
-            txtMessage = new Text(baseFont, "Scan your product in front of");
-            Canvas.SetTop(txtMessage, 30);
-            Canvas.SetLeft(txtMessage, 50);
-            canvas.Children.Add(txtMessage);
-            txtMessage = new Text(baseFont, "the camera pressing");
-            Canvas.SetTop(txtMessage, 45);
-            Canvas.SetLeft(txtMessage, 90);
-            canvas.Children.Add(txtMessage);
-            txtMessage = new Text(baseFont, "the button 'Start buying'");
-            Canvas.SetTop(txtMessage, 60);
-            Canvas.SetLeft(txtMessage, 75);
-            canvas.Children.Add(txtMessage);
-
-            byte[] normalButtonByte;
-            byte[] pressedButtonByte;
-
-            normalButtonByte = Resources.GetBytes(Resources.BinaryResources.startBuying);
-            pressedButtonByte = Resources.GetBytes(Resources.BinaryResources.PressedStartBuying);
-            normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
-            pressedButton = new Bitmap(pressedButtonByte, Bitmap.BitmapImageType.Jpeg);
-            normalButton.SetPixel(20, 20, GT.Color.Blue);
-            imgButton = new Image(normalButton);
-            Canvas.SetTop(imgButton, 110);
-            Canvas.SetLeft(imgButton, 80);
-            canvas.Children.Add(imgButton);
-            WindowGlod = 2;
-            imgButton.TouchDown += new TouchEventHandler(imgButton_TouchDown2);
-            imgButton.TouchUp += new TouchEventHandler(imgButton_TouchUp2);
-
+                
+            if (globalAuth == false)
+            {
+                txtMessage = new Text(baseFont, "Scan your QR code in front of");
+                Canvas.SetTop(txtMessage, 30);
+                Canvas.SetLeft(txtMessage, 50);
+                canvas.Children.Add(txtMessage);
+                txtMessage = new Text(baseFont, "the camera");
+                Canvas.SetTop(txtMessage, 45);
+                Canvas.SetLeft(txtMessage, 90);
+                canvas.Children.Add(txtMessage);
+            }
+            else
+            {
+                txtMessage = new Text(baseFont, "The authentication is failed.");
+                Canvas.SetTop(txtMessage, 30);
+                Canvas.SetLeft(txtMessage, 50);
+                canvas.Children.Add(txtMessage);
+                txtMessage = new Text(baseFont, "Please scan again your QR code in front of the camera.");
+                Canvas.SetTop(txtMessage, 45);
+                Canvas.SetLeft(txtMessage, 90);
+                canvas.Children.Add(txtMessage);
+            }
+            
+            
         }
 
         //Touch linked to the second window
@@ -324,7 +319,10 @@ namespace BoardApplication
                 hashtable.Add("Qty", qty);
                 list.Add(hashtable); 
             }
-            string json = JsonSerializer.SerializeObject(list);
+            Hashtable receiptTable = new Hashtable();
+            receiptTable.Add("UserID", user.UserID);
+            receiptTable.Add("List", list);
+            string json = JsonSerializer.SerializeObject(receiptTable);
             int token = client.AskToken();
             byte[] productBytes = Encoding.UTF8.GetBytes(json);
             client.SendData(productBytes, token);
@@ -333,7 +331,6 @@ namespace BoardApplication
 
         void createWindowFour()
         {
-
             Canvas canvas = new Canvas();
             window.Child = canvas;
             Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
@@ -344,63 +341,132 @@ namespace BoardApplication
 
         }
        
-        private void camera_PictureCaptured(Camera sender, GT.Picture picture)
+        private void camera_PictureCaptured(Camera sender,GT.Picture foto)
+        {
+            
+            picture = foto;
+
+            Thread t = new Thread(configurePicture);
+
+            t.Start();
+            t.Join();
+            if(WindowGlod==3)
+             createWindowThree();
+            else
+            {
+                if (user==null)   
+                    createWindowTwo();
+                else createWindowPurchase();
+            }
+        }
+
+        private void createWindowPurchase()
+        {
+            
+            byte[] normalButtonByte;
+            byte[] pressedButtonByte;
+            Canvas canvas = new Canvas();
+            window.Child = canvas;
+            window.Background = new SolidColorBrush(GT.Color.White);
+            
+            Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
+
+
+            txtMessage = new Text(baseFont, "Welcome " + user.name);
+            canvas.Children.Add(txtMessage);
+            Canvas.SetTop(txtMessage, 50);
+            Canvas.SetLeft(txtMessage, 40);
+
+            normalButtonByte = Resources.GetBytes(Resources.BinaryResources.startBuying);
+            pressedButtonByte = Resources.GetBytes(Resources.BinaryResources.PressedStartBuying);
+            normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
+            pressedButton = new Bitmap(pressedButtonByte, Bitmap.BitmapImageType.Jpeg);
+            normalButton.SetPixel(20, 20, GT.Color.Blue);
+            imgButton = new Image(normalButton);
+            Canvas.SetTop(imgButton, 110);
+            Canvas.SetLeft(imgButton, 80);
+            canvas.Children.Add(imgButton);
+            WindowGlod = 2;
+            imgButton.TouchDown += new TouchEventHandler(imgButton_TouchDown2);
+            imgButton.TouchUp += new TouchEventHandler(imgButton_TouchUp2);
+
+        }
+
+        private void configurePicture()
         {
             byte[] result = new byte[65536];
             int read = 0;
             result = picture.PictureData;
 
-          //  client = new Client();
+            //  client = new Client();
 
-          //  client.sendBytes(result);
-           int token = client.AskToken();
-           client.SendData(result,token);
-           
+            //  client.sendBytes(result);
+            Boolean receivedToken = false;
+            int token = 0;
+            while (receivedToken == false)
+            {
+                try
+                {
+                    token = client.AskToken();
+                    client.SendData(result, token);
+                    receivedToken = true;
+                }
+                catch (Exception e)
+                {
 
-           byte[] receivedMessage = client.ReceiveData(token);
+                }
+            }
+
+            byte[] receivedMessage = client.ReceiveData(token);
             //Debug.Print(Utils.BytesToString(receivedMessage));
-           if (barcodeError == true)
-           {
-               l.Remove("Error");
-               barcodeError = false;
-           }
-           if (Utils.BytesToString(receivedMessage).Equals("Error"))
-           {
-               barcodeError = true;
-           }
-           else
-           {
-               Hashtable hashTable = JsonSerializer.DeserializeString(Utils.BytesToString(receivedMessage)) as Hashtable;
+            if (barcodeError == true)
+            {
+                l.Remove("Error");
+                barcodeError = false;
+            }
+            if (Utils.BytesToString(receivedMessage).Equals("Error"))
+            {
+                barcodeError = true;
+                if(WindowGlod==2)
+                  globalAuth = true;
+            }else{
+                Hashtable hashTable = JsonSerializer.DeserializeString(Utils.BytesToString(receivedMessage)) as Hashtable;
 
-
-               ProductInfo prod = new ProductInfo();
-               prod.IDProduct = hashTable["ID"] as String;
-               if (!l.Contains(prod.IDProduct))
-               {
-                   prod.productName = hashTable["Product_name"] as String;
-                   String priceString = hashTable["Price"] as String;
-                   prod.price = Double.Parse(priceString);
-                   String pointString = hashTable["Points"] as String;
-                   prod.points = Double.Parse(pointString);
-                   prod.Qty++;
-                   l.Add(prod.IDProduct, prod);
-               }
-               else
-               {
-                   (l[prod.IDProduct] as ProductInfo).Qty++;
-               }
-           }
+                if (WindowGlod == 2)
+                {
+                    user = new UserInfo();
+                    user.name = hashTable["Name"] as String;
+                    user.surname = hashTable["Surname"] as String;
+                    user.UserID = hashTable["ID"] as String;                         
+                }
+                else
+                {
+                    ProductInfo prod = new ProductInfo();
+                    prod.IDProduct = hashTable["ID"] as String;
+                    if (!l.Contains(prod.IDProduct))
+                    {
+                        prod.productName = hashTable["Product_name"] as String;
+                        String priceString = hashTable["Price"] as String;
+                        prod.price = Double.Parse(priceString);
+                        String pointString = hashTable["Points"] as String;
+                        prod.points = Double.Parse(pointString);
+                        prod.Qty++;
+                        l.Add(prod.IDProduct, prod);
+                    }
+                    else
+                    {
+                        (l[prod.IDProduct] as ProductInfo).Qty++;
+                    }
+                }
+            }
            
-           
-           createWindowThree();
         }
-        
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
         {
-           // tunes.Play(1100, 300);
-            if(WindowGlod==3)
-             camera.TakePicture();      
+            // tunes.Play(1100, 300);
+            if (WindowGlod == 3 || WindowGlod == 2) 
+                camera.TakePicture();      
         }
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
