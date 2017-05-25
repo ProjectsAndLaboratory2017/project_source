@@ -23,10 +23,9 @@ namespace ServerApplicationWPF.Model
             Points = points;
         }
 
-        public string toString()
+        public string ToString()
         {
-            // TODO use this method to serialize
-            return ProductId + ":" + Name;
+            return "{\"ID\":\"" + ProductId + "\",\"Product_name\":\"" + Name + "\",\"Price\":\"" + Price + "\",\"Points\":\"" + Points + "\"}";
         }
     }
 }

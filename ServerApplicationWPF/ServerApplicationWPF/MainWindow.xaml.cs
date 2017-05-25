@@ -18,6 +18,8 @@ using System.IO;
 using System.Collections;
 using ServerApplicationWPF.Model;
 using ZXing;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ServerApplicationWPF
 {
@@ -38,6 +40,7 @@ namespace ServerApplicationWPF
             codeScanner = new CodeScanner();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
             dbConnect = new DataManager();
+            Console.WriteLine("ciao");
         }
 
         private void messageProcessing(string message)
@@ -68,36 +71,44 @@ namespace ServerApplicationWPF
                     result = reader.Decode(image);
                     rotation++;
                 }
-                messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
+                //messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
                 NetworkResponse response;
                 if (result != null)
                 {
-                    /*
-                    string qrCode = getQr(result);
-                    // check if it was a qrCode
-                    if (qrCode != null)
+                    if (result.BarcodeFormat == BarcodeFormat.QR_CODE)
                     {
-                        // this is a user ID
-                        // TODO search user in DB
+                        // this is a user
+                        string textResult = result.Text;
+                        messageProcessing("Scan done. Found QR code: " + result);
+                        Customer c = dbConnect.getCustomerByBarcode(textResult);
+                        if (c == null)
+                        {
+                            messageProcessing("No user found with this barcode");
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("Error"));
+                        }
+                        else
+                        {
+                            messageProcessing("User found: " + c.Email);
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(c.ToString()));
+                        }
                     }
                     else
                     {
-                        string productID = getProductID(result);
-                        // this is a product
-                        // TODO search product in DB
-                    }*/
-                    string textResult = result.Text;
-                    messageProcessing("Scan done. Found: " + result);
-                    Product p = dbConnect.getProductByBarcode(textResult);
-                    if (p == null)
-                    {
-                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("Error"));
-                    } else
-                    {
-                        response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("{\"ID\":\"" + p.ProductId + "\",\"Product_name\":\"" + p.Name + "\",\"Price\":\"" + p.Price + "\",\"Points\":\"" + p.Points + "\"}"));
+                        // this should be a product
+                        string textResult = result.Text;
+                        messageProcessing("Scan done. Found: " + result);
+                        Product p = dbConnect.getProductByBarcode(textResult);
+                        if (p == null)
+                        {
+                            messageProcessing("No products found");
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Encoding.UTF8.GetBytes("Error"));
+                        }
+                        else
+                        {
+                            messageProcessing("Product found: " + p.Name);
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes(p.ToString()));
+                        }
                     }
-                    
-                    
                 }
                 else
                 {
@@ -109,6 +120,26 @@ namespace ServerApplicationWPF
             else if (request.requestType == NetworkRequest.RequestType.ReceiptStorageRequest)
             {
                 // TODO
+                string req = UDPNetwork.Utils.BytesToString(request.Payload);
+                JObject receipt = JObject.Parse(req);
+                String userId = receipt["UserID"].ToString();
+                JArray list = receipt["List"] as JArray;
+                IList<JToken> products = list.Children().ToList();
+                // TODO get customer id
+                Receipt receiptObj = new Receipt(userId);
+
+                foreach (var product in products)
+                {
+                    String id = product["ID"].ToString();
+                    String qty = product["Qty"].ToString();
+
+                    messageProcessing("product id: " + id + " qty: " + qty);
+
+                    receiptObj.Items.Add(id, int.Parse(qty));
+                }
+
+                dbConnect.InsertReceipt(receiptObj);
+                // TODO return ok to the board
                 return null;
             }
             else
@@ -142,6 +173,7 @@ namespace ServerApplicationWPF
             try
             {
                 Log.Text += "\n" + message;
+                MyScrollViewer.ScrollToBottom();
             }
             catch (Exception e)
             {
@@ -157,7 +189,7 @@ namespace ServerApplicationWPF
         private void button_Click(object sender, RoutedEventArgs e)
         {
             Product product = dbConnect.getProductByBarcode(barcode_txt.Text);
-            db_output.Text = product.toString();
+            db_output.Text = product.Name;
         }
 
         private Bitmap rotateImage90(Bitmap b)

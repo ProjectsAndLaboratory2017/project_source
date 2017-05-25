@@ -55,56 +55,14 @@ if (! isset ( $_SESSION ['userId'] )) {
 		<div class="row rm">
 			<div class="col-md-2">
 				<br /> <br /> <br />
-				
-				<form name="view_customers_form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-						<div class="form-group">
-							<input type="submit" class="btn btn-success btn-text" name="view_customers" value="View Customers">
-						</div>
-				</form>
-				
-				<form name="view_products_form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-						<div class="form-group">
-							<input type="submit" class="btn btn-success btn-text" name="view_products" value="View Products">
-						</div>
-				</form>
-				
-				<form name="view_purchases_form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-						<div class="form-group">
-							<input type="submit" class="btn btn-success btn-text" name="view_purchases" value="View Purchases">
-						</div>
-				</form>
-				<form name="add_product_form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-						<div class="form-group">
-							<input type="submit" class="btn btn-success btn-text" name="add_product" value="Add Product">
-						</div>
-				</form>
-				
-				<!--a class="btn btn-success btn-text" href="my_profile.php">View Customers</a> 
+				<a class="btn btn-success btn-text" href="my_profile.php">My Profile</a> 
 				<br /> <br />
-				<a class="btn btn-success btn-text" href="home.php">View Products</a> 
+				<a class="btn btn-success btn-text" href="home.php">My Purchases</a> 
 				<br /> <br />
-				<a class="btn btn-success btn-text" href="all_reservations.php">View Purchases</a-->
+				<!--a class="btn btn-success btn-text" href="all_reservations.php">Show All Reservations</a-->
 			</div>
 			<div class="col-md-10">	
-				<?php 
-					if (isset ( $_POST ['view_customers'] )) {
-						include 'view_customers.php';
-					}
-					else if(isset ( $_POST ['view_products'] )){
-						include 'view_products.php';
-					}
-					else if(isset ( $_POST ['view_purchases'] )){
-						include 'view_purchases.php';
-					}
-					else if(isset ( $_POST ['add_product'] )){
-						header ( "Location: add_product.php" );
-						//include 'add_product.php';
-					}
-					else{
-						include 'view_customers.php';
-					}
-					
-				?>
+				<?php include 'my_profile.php' ?>
 			</div>
 		</div>
 		<div class="row rm">

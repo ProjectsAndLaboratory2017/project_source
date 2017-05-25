@@ -78,16 +78,35 @@ class DataManager
     public void InsertReceipt(Receipt receipt)
     {
         string query = "INSERT INTO receipt (ReceiptId, ProductId, CustomerId, Date, Quantity) VALUES(@receipt, @product, @customer, @date, @quantity)";
+        string getMaxIdQuery = "SELECT max(ReceiptId) FROM receipt";
 
         //open connection
         if (this.OpenConnection() == true)
         {
+
+            /**
+             * TODOs:
+             * - decrease the quantity on the product table
+             * - evaluation of the points and add points to the customer
+             * 
+             * 
+             */
+            // get the max receipt id
+            MySqlCommand getMaxReceiptIdCmd = new MySqlCommand(getMaxIdQuery, connection);
+            MySqlDataReader dataReader = getMaxReceiptIdCmd.ExecuteReader();
+            dataReader.Read();
+            int receiptId = 0;
+            if (dataReader.HasRows)
+            {
+                receiptId = dataReader.GetInt32(0);
+            }
+            dataReader.Close();
+            receiptId++;
             //create command and assign the query and connection from the constructor
             MySqlCommand cmd = new MySqlCommand(query, connection);
             // prepare statement to avoid SQL injection
             cmd.Prepare();
 
-            int receiptId = 123; // TODO get biggest receiptId and increment it
 
             MySqlParameter productId = new MySqlParameter("@product", "FILL_ME");
             MySqlParameter quantity = new MySqlParameter("@quantity", "FILL_ME");
