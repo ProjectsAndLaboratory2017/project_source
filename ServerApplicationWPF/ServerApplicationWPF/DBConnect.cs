@@ -49,13 +49,12 @@ class DataManager
             {
                 case 0:
                     throw new System.Exception("Cannot connect to server.  Contact administrator");
-                    break;
 
                 case 1045:
                     throw new System.Exception("Invalid username/password, please try again");
-                    break;
+                default:
+                    throw new System.Exception("Exception opening connection to db: " + ex.Message);
             }
-            return false;
         }
     }
 
@@ -69,8 +68,7 @@ class DataManager
         }
         catch (MySqlException ex)
         {
-            throw new System.Exception(ex.Message);
-            return false;
+            throw new System.Exception("Exception closing connection to database: " + ex.Message);
         }
     }
 

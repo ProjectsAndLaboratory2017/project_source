@@ -23,7 +23,7 @@ namespace ServerApplicationWPF.Model
             Points = points;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return "{\"ID\":\"" + ProductId + "\",\"Product_name\":\"" + Name + "\",\"Price\":\"" + Price + "\",\"Points\":\"" + Points + "\"}";
         }
