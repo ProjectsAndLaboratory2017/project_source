@@ -151,5 +151,16 @@
   <ItemGroup>
     <None Include="Resources\startBuying.jpg" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\NormalDelete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PressedDelete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NormalDelete.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PressedDelete.jpg" />
+  </ItemGroup>
 </Project>
