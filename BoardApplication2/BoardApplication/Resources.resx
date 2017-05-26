@@ -142,4 +142,10 @@
   <data name="startBuying" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\startBuying.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
+  <data name="NormalDelete" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\NormalDelete.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="PressedDelete" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\PressedDelete.jpg;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
 </root>

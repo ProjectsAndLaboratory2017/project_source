@@ -9,13 +9,9 @@ using Microsoft.SPOT.Presentation.Media;
 using Microsoft.SPOT.Presentation.Shapes;
 using Microsoft.SPOT.Touch;
 using Microsoft.SPOT.Input;
-
 using System.IO;
 using System.Net;
 using System.Text;
-
-
-
 using Gadgeteer.Networking;
 using GT = Gadgeteer;
 using GTM = Gadgeteer.Modules;
@@ -42,24 +38,12 @@ namespace BoardApplication
         private GT.Picture picture;
         private UserInfo user;
         private Boolean globalAuth = false;
+        private Boolean firstPicture = true;
+        private String stringError = "Error: repeat the scanning of the picture";
+        
         // This method is run when the mainboard is powered up or reset.   
         void ProgramStarted()
-        {
-            /*******************************************************************************************
-            Modules added in the Program.gadgeteer designer view are used by typing 
-            their name followed by a period, e.g.  button.  or  camera.
-            
-            Many modules generate useful events. Type +=<tab><tab> to add a handler to an event, e.g.:
-                button.ButtonPressed +=<tab><tab>
-            
-            If you want to do something periodically, use a GT.Timer and handle its Tick event, e.g.:
-                GT.Timer timer = new GT.Timer(1000); // every second (1000ms)
-                timer.Tick +=<tab><tab>
-                timer.Start();
-            *******************************************************************************************/
-
-
-
+        {    
             // Use Debug.Print to show messages in Visual Studio's "Output" window during debugging.
              String[] array = {"192.168.1.1"};
              ethernetJ11D.NetworkInterface.Open();
@@ -75,7 +59,9 @@ namespace BoardApplication
                  Thread.Sleep(250);
              }
 
-            camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured); 
+            camera.PictureCaptured += new Camera.PictureCapturedEventHandler(camera_PictureCaptured);
+            camera.TakePicture();
+           // camera.TakePicture();
             button.ButtonPressed += new Button.ButtonEventHandler(button_ButtonPressed);
                           
             Debug.Print("Program Started");
@@ -97,8 +83,7 @@ namespace BoardApplication
          
         }
 
-       
-
+      
         //Touch event linked to the first window.
         void imgButton_TouchUp(object sender, TouchEventArgs e)
         {
@@ -121,6 +106,9 @@ namespace BoardApplication
         void createWindowOne()
         {
             user = null;
+            globalAuth = false;
+            barcodeError = false;
+            flagButtonPressHere = false;
             byte[] normalButtonByte;
             byte[] pressedButtonByte;
             Canvas canvas = new Canvas();
@@ -130,13 +118,15 @@ namespace BoardApplication
 
             l.Clear();
             Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
-
+            
+            
             txtMessage = new Text(baseFont, "Welcome to the automatic cash.");
 
             canvas.Children.Add(txtMessage);
             Canvas.SetTop(txtMessage, 30);
             Canvas.SetLeft(txtMessage, 45);
             txtMessage = new Text(baseFont, "Select your products pressing the");
+            
             canvas.Children.Add(txtMessage);
             Canvas.SetTop(txtMessage, 50);
             Canvas.SetLeft(txtMessage, 40);
@@ -150,7 +140,7 @@ namespace BoardApplication
             normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
             pressedButton = new Bitmap(pressedButtonByte, Bitmap.BitmapImageType.Jpeg);
 
-            normalButton.SetPixel(20, 20, GT.Color.Blue);
+            normalButton.SetPixel(154, 55, GT.Color.Blue);
             imgButton = new Image(normalButton);
             canvas.Children.Add(imgButton);
             Canvas.SetTop(imgButton, 110);
@@ -169,13 +159,18 @@ namespace BoardApplication
                 
             if (globalAuth == false)
             {
-                txtMessage = new Text(baseFont, "Scan your QR code in front of");
-                Canvas.SetTop(txtMessage, 30);
-                Canvas.SetLeft(txtMessage, 50);
-                canvas.Children.Add(txtMessage);
-                txtMessage = new Text(baseFont, "the camera");
-                Canvas.SetTop(txtMessage, 45);
+                txtMessage = new Text(baseFont, "SCAN YOUR QR CODE ");
+                Canvas.SetTop(txtMessage, 70);
                 Canvas.SetLeft(txtMessage, 90);
+                
+                canvas.Children.Add(txtMessage);
+                txtMessage = new Text(baseFont, "IN FRONT OF ");
+                Canvas.SetTop(txtMessage, 100);
+                Canvas.SetLeft(txtMessage, 108);
+                canvas.Children.Add(txtMessage);
+                txtMessage = new Text(baseFont, "THE CAMERA");
+                Canvas.SetTop(txtMessage, 130);
+                Canvas.SetLeft(txtMessage, 110);
                 canvas.Children.Add(txtMessage);
             }
             else
@@ -184,13 +179,16 @@ namespace BoardApplication
                 Canvas.SetTop(txtMessage, 30);
                 Canvas.SetLeft(txtMessage, 50);
                 canvas.Children.Add(txtMessage);
-                txtMessage = new Text(baseFont, "Please scan again your QR code in front of the camera.");
-                Canvas.SetTop(txtMessage, 45);
-                Canvas.SetLeft(txtMessage, 90);
+                txtMessage = new Text(baseFont, "Please scan again your QR code ");
+                Canvas.SetTop(txtMessage, 75);
+                Canvas.SetLeft(txtMessage, 50);
+                canvas.Children.Add(txtMessage);
+                txtMessage = new Text(baseFont, "in front of the camera.");
+                Canvas.SetTop(txtMessage, 95);
+                Canvas.SetLeft(txtMessage, 75);
                 canvas.Children.Add(txtMessage);
             }
-            
-            
+                 
         }
 
         //Touch linked to the second window
@@ -214,6 +212,12 @@ namespace BoardApplication
         //WINDOW THREE
         void createWindowThree()
         {
+            byte[] normalButtonByte;
+            byte[] pressedButtonByte;
+            byte[] deleteNormalButtonByte;
+            byte[] deletePressedButtonByte;
+           
+
             Canvas canvas = new Canvas();
             window.Child = canvas;
             Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
@@ -222,59 +226,62 @@ namespace BoardApplication
             Canvas.SetLeft(txtMessage, 30);
             canvas.Children.Add(txtMessage);
 
+            Image[] deleteButton = new Image[l.Count];
+            
             WindowGlod = 3;
-           
-          //  Here I develop the communication in order to get the objects
-       /*
-            int i = 2, tot = 0;
-            l.Add("Bread          " + i.ToString() + "$");
-            tot += i;
-            i++;
-            l.Add("Potatos          " + i.ToString() + "$");
-            tot += i;
-            i++;
-            l.Add("Chocolate          " + i.ToString() + "$");
-            tot += i;
-            i++;
-            l.Add("Mais          " + i.ToString() + "$");
-
-            tot += i;
-            i++;
-            l.Add("Apple         " + i.ToString() + "$");
-            tot += i;
-            i++;
-            l.Add("Salad         " + i.ToString() + "$");
-            tot += i;
-            i++;
-           */
-
+          
             int top = 30;
             int left = 30;
-            int i;
+            int i=0;
             foreach (DictionaryEntry d in l)
-            {          
+            {
+
+                deleteNormalButtonByte = Resources.GetBytes(Resources.BinaryResources.NormalDelete);
+                deletePressedButtonByte = Resources.GetBytes(Resources.BinaryResources.PressedDelete);
+
+                Bitmap bitmapNormalButton = new Bitmap(deleteNormalButtonByte, Bitmap.BitmapImageType.Jpeg);
+                Bitmap bitmapPressedButton = new Bitmap(deletePressedButtonByte, Bitmap.BitmapImageType.Jpeg);
+                bitmapNormalButton.SetPixel(10, 10, GT.Color.Blue);
+                deleteButton[i] = new Image(bitmapNormalButton);
+                
+                deleteButton[i].TouchDown += new TouchEventHandler(imgButton_TouchDownDelete);
+                deleteButton[i].TouchUp += new TouchEventHandler(imgButton_TouchUpDelete);
+                
                 ProductInfo p = d.Value as ProductInfo;
-                String s = p.productName+" "+p.price+"$";
+                String s = p.productName + " " + p.price + "$" + "    " + p.Qty+"-";
+
+
+                Canvas.SetTop(deleteButton[i], top);
+                Canvas.SetLeft(deleteButton[i], 150);
+                canvas.Children.Add(deleteButton[i]);
+                i++;
                 txtMessage = new Text(baseFont,s);
+
                 Canvas.SetTop(txtMessage, top);
                 Canvas.SetLeft(txtMessage, left);
                 canvas.Children.Add(txtMessage);
                 top += 15;
             }
-            byte[] normalButtonByte;
-            byte[] pressedButtonByte;
 
+            if (barcodeError == true)
+            {
+                txtMessage = new Text(baseFont, stringError);
+                Canvas.SetTop(txtMessage, top);
+                Canvas.SetLeft(txtMessage, left);
+                canvas.Children.Add(txtMessage);
+                top += 15;
+            }
+            
 
             normalButtonByte = Resources.GetBytes(Resources.BinaryResources.payButton);
             pressedButtonByte = Resources.GetBytes(Resources.BinaryResources.payButtonPressed);
             normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
             pressedButton = new Bitmap(pressedButtonByte, Bitmap.BitmapImageType.Jpeg);
-            normalButton.SetPixel(20, 20, GT.Color.Blue);
+            normalButton.SetPixel(154, 55, GT.Color.Blue);
             imgButton = new Image(normalButton);
             Canvas.SetTop(imgButton, 170);
             Canvas.SetLeft(imgButton, 80);
             canvas.Children.Add(imgButton);
-
 
             imgButton.TouchDown += new TouchEventHandler(imgButton_TouchDown3);
             imgButton.TouchUp += new TouchEventHandler(imgButton_TouchUp3);
@@ -287,6 +294,20 @@ namespace BoardApplication
             }            */
         }
 
+        private void imgButton_TouchDownDelete(object sender, TouchEventArgs e)
+        {
+                       
+            
+
+
+
+        }
+
+        private void imgButton_TouchUpDelete(object sender, TouchEventArgs e)
+        {
+            
+        }
+
         //Touch linked to window three
         void imgButton_TouchUp3(object sender, TouchEventArgs e)
         {
@@ -294,9 +315,36 @@ namespace BoardApplication
             if (flagButtonPressHere == true)
             {
                 flagButtonPressHere = false;
-               // createWindowFour(); This window doesn't appear on the screen.
+                int i;
+                ArrayList list = new ArrayList();
+                foreach (DictionaryEntry d in l)
+                {
+                    ProductInfo p = d.Value as ProductInfo;
+                    String productId = p.IDProduct;
 
-                createWindowOne();
+                    Double qty = p.Qty;
+                    Hashtable hashtable = new Hashtable();
+
+                    hashtable.Add("ID", productId);
+                    hashtable.Add("Qty", qty);
+                    list.Add(hashtable);
+                }
+
+                Hashtable receiptTable = new Hashtable();
+                receiptTable.Add("UserID", user.UserID);
+                receiptTable.Add("List", list);
+                string json = JsonSerializer.SerializeObject(receiptTable);
+                int token = client.AskToken();
+                byte[] productBytes = Encoding.UTF8.GetBytes(json);
+                client.SendData(productBytes, token);
+
+                if (Utils.BytesToString(client.ReceiveData(token)).Equals("OK"))
+                {
+                    l.Clear();
+                    createWindowFour();
+                }
+                else flagButtonPressHere = false;
+                //createWindowOne();
             }
         }
 
@@ -304,60 +352,50 @@ namespace BoardApplication
         {
             imgButton.Bitmap = pressedButton;
             flagButtonPressHere = true;
-            int i;
-            
-            ArrayList list = new ArrayList();
-            foreach (DictionaryEntry d in l)
-            {
-                ProductInfo p = d.Value as ProductInfo;
-                String productId = p.IDProduct;
-               
-                Double qty = p.Qty;
-                Hashtable hashtable = new Hashtable();
-                
-                hashtable.Add("ID",productId);
-                hashtable.Add("Qty", qty);
-                list.Add(hashtable); 
-            }
-            Hashtable receiptTable = new Hashtable();
-            receiptTable.Add("UserID", user.UserID);
-            receiptTable.Add("List", list);
-            string json = JsonSerializer.SerializeObject(receiptTable);
-            int token = client.AskToken();
-            byte[] productBytes = Encoding.UTF8.GetBytes(json);
-            client.SendData(productBytes, token);
-
         }
 
         void createWindowFour()
         {
+            GT.Timer timer = new GT.Timer(3000); // Create a timer
             Canvas canvas = new Canvas();
             window.Child = canvas;
             Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
-            txtMessage = new Text(baseFont, "Thanks for your purchase!");
-            Canvas.SetTop(txtMessage, 10);
+            txtMessage = new Text(baseFont, "THANKS FOR YOUR PURCHASE!");
+            Canvas.SetTop(txtMessage, 100);
             Canvas.SetLeft(txtMessage, 70);
             canvas.Children.Add(txtMessage);
 
+            
+            timer.Tick += timer_Tick; // Run the method timer_tick when the timer ticks
+            timer.Start(); // Start the timer
         }
        
+
+        void timer_Tick(GT.Timer timer){
+            timer.Stop();
+            createWindowOne();
+        }
+
         private void camera_PictureCaptured(Camera sender,GT.Picture foto)
         {
             
             picture = foto;
-
-            Thread t = new Thread(configurePicture);
-
-            t.Start();
-            t.Join();
-            if(WindowGlod==3)
-             createWindowThree();
-            else
+            if (firstPicture == false)
             {
-                if (user==null)   
-                    createWindowTwo();
-                else createWindowPurchase();
+                Thread t = new Thread(configurePicture);
+
+                t.Start();
+                t.Join();
+                if (WindowGlod == 3)
+                    createWindowThree();
+                else
+                {
+                    if (user == null)
+                        createWindowTwo();
+                    else createWindowPurchase();
+                }
             }
+            else firstPicture = false;
         }
 
         private void createWindowPurchase()
@@ -371,17 +409,16 @@ namespace BoardApplication
             
             Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
 
-
             txtMessage = new Text(baseFont, "Welcome " + user.name);
             canvas.Children.Add(txtMessage);
-            Canvas.SetTop(txtMessage, 50);
+            Canvas.SetTop(txtMessage, 80);
             Canvas.SetLeft(txtMessage, 40);
 
             normalButtonByte = Resources.GetBytes(Resources.BinaryResources.startBuying);
             pressedButtonByte = Resources.GetBytes(Resources.BinaryResources.PressedStartBuying);
             normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
             pressedButton = new Bitmap(pressedButtonByte, Bitmap.BitmapImageType.Jpeg);
-            normalButton.SetPixel(20, 20, GT.Color.Blue);
+            normalButton.SetPixel(154, 55, GT.Color.Blue);
             imgButton = new Image(normalButton);
             Canvas.SetTop(imgButton, 110);
             Canvas.SetLeft(imgButton, 80);
@@ -389,7 +426,6 @@ namespace BoardApplication
             WindowGlod = 2;
             imgButton.TouchDown += new TouchEventHandler(imgButton_TouchDown2);
             imgButton.TouchUp += new TouchEventHandler(imgButton_TouchUp2);
-
         }
 
         private void configurePicture()
@@ -398,9 +434,6 @@ namespace BoardApplication
             int read = 0;
             result = picture.PictureData;
 
-            //  client = new Client();
-
-            //  client.sendBytes(result);
             Boolean receivedToken = false;
             int token = 0;
             while (receivedToken == false)
@@ -421,15 +454,18 @@ namespace BoardApplication
             //Debug.Print(Utils.BytesToString(receivedMessage));
             if (barcodeError == true)
             {
-                l.Remove("Error");
+             //   l.Remove("Error");
                 barcodeError = false;
             }
             if (Utils.BytesToString(receivedMessage).Equals("Error"))
             {
                 barcodeError = true;
-                if(WindowGlod==2)
-                  globalAuth = true;
-            }else{
+                
+                if (WindowGlod == 2)
+                    globalAuth = true;
+            }
+            else
+            {
                 Hashtable hashTable = JsonSerializer.DeserializeString(Utils.BytesToString(receivedMessage)) as Hashtable;
 
                 if (WindowGlod == 2)
@@ -437,7 +473,7 @@ namespace BoardApplication
                     user = new UserInfo();
                     user.name = hashTable["Name"] as String;
                     user.surname = hashTable["Surname"] as String;
-                    user.UserID = hashTable["ID"] as String;                         
+                    user.UserID = hashTable["ID"] as String;
                 }
                 else
                 {
@@ -459,7 +495,6 @@ namespace BoardApplication
                     }
                 }
             }
-           
         }
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
