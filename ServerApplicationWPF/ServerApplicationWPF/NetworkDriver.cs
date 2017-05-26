@@ -31,6 +31,11 @@ namespace ServerApplicationWPF
         }
         private void start_listener(object obj)
         {
+            // set the dot separator for floats
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
             UDPNetwork.Server server = new UDPNetwork.Server(8000);
 
             //accept a client
@@ -92,8 +97,9 @@ namespace ServerApplicationWPF
                     JsonConvert.DeserializeObject(req);
                     type = NetworkRequest.RequestType.ReceiptStorageRequest;
                 }
-                catch (JsonException e)
+                catch (JsonException)
                 {
+                    // if it is not json, it is a simple byte[] with image inside
                     type = NetworkRequest.RequestType.ImageProcessingRequest;
                 }
                 

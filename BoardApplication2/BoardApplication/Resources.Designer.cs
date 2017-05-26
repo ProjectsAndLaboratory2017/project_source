@@ -38,8 +38,10 @@ namespace BoardApplication
         {
             PressedStartBuying = -27600,
             NormalButton = -22972,
+            PressedDelete = -19996,
             payButton = -18159,
             PressedButton = -11274,
+            NormalDelete = 12591,
             payButtonPressed = 20343,
             startBuying = 28347,
         }

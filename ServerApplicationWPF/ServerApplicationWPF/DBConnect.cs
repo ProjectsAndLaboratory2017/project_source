@@ -49,13 +49,12 @@ class DataManager
             {
                 case 0:
                     throw new System.Exception("Cannot connect to server.  Contact administrator");
-                    break;
 
                 case 1045:
                     throw new System.Exception("Invalid username/password, please try again");
-                    break;
+                default:
+                    throw new System.Exception("Exception opening connection to db: " + ex.Message);
             }
-            return false;
         }
     }
 
@@ -69,8 +68,7 @@ class DataManager
         }
         catch (MySqlException ex)
         {
-            throw new System.Exception(ex.Message);
-            return false;
+            throw new System.Exception("Exception closing connection to database: " + ex.Message);
         }
     }
 
@@ -78,16 +76,35 @@ class DataManager
     public void InsertReceipt(Receipt receipt)
     {
         string query = "INSERT INTO receipt (ReceiptId, ProductId, CustomerId, Date, Quantity) VALUES(@receipt, @product, @customer, @date, @quantity)";
+        string getMaxIdQuery = "SELECT max(ReceiptId) FROM receipt";
 
         //open connection
         if (this.OpenConnection() == true)
         {
+
+            /**
+             * TODOs:
+             * - decrease the quantity on the product table
+             * - evaluation of the points and add points to the customer
+             * 
+             * 
+             */
+            // get the max receipt id
+            MySqlCommand getMaxReceiptIdCmd = new MySqlCommand(getMaxIdQuery, connection);
+            MySqlDataReader dataReader = getMaxReceiptIdCmd.ExecuteReader();
+            dataReader.Read();
+            int receiptId = 0;
+            if (dataReader.HasRows)
+            {
+                receiptId = dataReader.GetInt32(0);
+            }
+            dataReader.Close();
+            receiptId++;
             //create command and assign the query and connection from the constructor
             MySqlCommand cmd = new MySqlCommand(query, connection);
             // prepare statement to avoid SQL injection
             cmd.Prepare();
 
-            int receiptId = 123; // TODO get biggest receiptId and increment it
 
             MySqlParameter productId = new MySqlParameter("@product", "FILL_ME");
             MySqlParameter quantity = new MySqlParameter("@quantity", "FILL_ME");

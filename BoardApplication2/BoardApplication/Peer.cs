@@ -47,37 +47,41 @@ namespace BoardApplication
 
                         // now wait for the ACK a limited time
                         socket.ReceiveTimeout = Utils.FRAGMENT_TIMEOUT;
-                        byte[] datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
-                        TokenAndData response_parsed = new TokenAndData(datagram);
-                        if (response_parsed.Token != token)
-                        {
-                            retry = 0;
-                            throw new Exception("The server answered with another token: " + response_parsed.Token);
-                        }
-                        if (response_parsed.SequenceNumber != sequenceNumber)
-                        {
-                            if (response_parsed.SequenceNumber < sequenceNumber)
+
+               //         if (sequenceNumber % 2 == 1)
+                //        {
+                            byte[] datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
+                            TokenAndData response_parsed = new TokenAndData(datagram);
+                            if (response_parsed.Token != token)
                             {
-                                // already received
-                                continue;
+                                retry = 0;
+                                throw new Exception("The server answered with another token: " + response_parsed.Token);
                             }
-                            throw new Exception("The server answered with a wrong sequence number " + response_parsed.SequenceNumber);
+                            if (response_parsed.SequenceNumber != sequenceNumber)
+                            {
+                                if (response_parsed.SequenceNumber < sequenceNumber)
+                                {
+                                    // already received
+                                    continue;
+                                }
+                                throw new Exception("The server answered with a wrong sequence number " + response_parsed.SequenceNumber);
+                            }
+                            ack_string = Utils.BytesToString(response_parsed.Data);
+                  //      }else ack_string = Utils.ACK;
                         }
-                        ack_string = Utils.BytesToString(response_parsed.Data);
-                    }
-                    catch (SocketException e)
+                        catch (SocketException e)
+                        {
+                            //
+                        }
+                        retry--;
+                    } while (ack_string != Utils.ACK && retry > 0);
+                    if (retry <= 0)
                     {
-                        //
+                        throw new Exception("Max number of trials reached");
                     }
-                    retry--;
-                } while (ack_string != Utils.ACK && retry > 0);
-                if (retry <= 0)
-                {
-                    throw new Exception("Max number of trials reached");
-                }
-                // put again retry to max value because transmission succeeded
-                retry = Utils.MAX_RETRY;
-                sequenceNumber++;
+                    // put again retry to max value because transmission succeeded
+                    retry = Utils.MAX_RETRY;
+                    sequenceNumber++;
             }
 
         }
