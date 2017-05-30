@@ -31,6 +31,7 @@ namespace BoardApplication
         private Boolean flagButtonPressHere = false;
         private Window window;
         private Hashtable l = new Hashtable();
+        private Hashtable deleteProducts = new Hashtable();
         private int flagThread = 0;
         private HttpWebRequest clientReq;
         private int WindowGlod = 0;
@@ -40,7 +41,11 @@ namespace BoardApplication
         private Boolean globalAuth = false;
         private Boolean firstPicture = true;
         private String stringError = "Error: repeat the scanning of the picture";
-        
+        private Image deleteButton;
+        private Bitmap bitmapNormalButton;
+        private Bitmap bitmapPressedButton;
+        private Boolean flagDeleteButton=false;
+
         // This method is run when the mainboard is powered up or reset.   
         void ProgramStarted()
         {    
@@ -109,6 +114,7 @@ namespace BoardApplication
             globalAuth = false;
             barcodeError = false;
             flagButtonPressHere = false;
+            flagDeleteButton = false;
             byte[] normalButtonByte;
             byte[] pressedButtonByte;
             Canvas canvas = new Canvas();
@@ -226,7 +232,7 @@ namespace BoardApplication
             Canvas.SetLeft(txtMessage, 30);
             canvas.Children.Add(txtMessage);
 
-            Image[] deleteButton = new Image[l.Count];
+            deleteButton = new Image();
             
             WindowGlod = 3;
           
@@ -239,28 +245,36 @@ namespace BoardApplication
                 deleteNormalButtonByte = Resources.GetBytes(Resources.BinaryResources.NormalDelete);
                 deletePressedButtonByte = Resources.GetBytes(Resources.BinaryResources.PressedDelete);
 
-                Bitmap bitmapNormalButton = new Bitmap(deleteNormalButtonByte, Bitmap.BitmapImageType.Jpeg);
-                Bitmap bitmapPressedButton = new Bitmap(deletePressedButtonByte, Bitmap.BitmapImageType.Jpeg);
-                bitmapNormalButton.SetPixel(10, 10, GT.Color.Blue);
-                deleteButton[i] = new Image(bitmapNormalButton);
-                
-                deleteButton[i].TouchDown += new TouchEventHandler(imgButton_TouchDownDelete);
-                deleteButton[i].TouchUp += new TouchEventHandler(imgButton_TouchUpDelete);
+                bitmapNormalButton = new Bitmap(deleteNormalButtonByte, Bitmap.BitmapImageType.Jpeg);
+                bitmapPressedButton = new Bitmap(deletePressedButtonByte, Bitmap.BitmapImageType.Jpeg);
+                //bitmapNormalButton.SetPixel(10, 10, GT.Color.Blue);
+
+                bitmapNormalButton.SetPixel(54, 60, GT.Color.Blue);
+                deleteButton = new Image(bitmapNormalButton);
+
+
+
+                deleteButton.TouchDown += new TouchEventHandler(imgButton_TouchDownDelete);
+                deleteButton.TouchUp += new TouchEventHandler(imgButton_TouchUpDelete);
+                if (deleteProducts.Contains(d.Key))
+                    deleteProducts.Remove(d.Key);
+
+                deleteProducts.Add(d.Key, deleteButton);
                 
                 ProductInfo p = d.Value as ProductInfo;
-                String s = p.productName + " " + p.price + "$" + "    " + p.Qty+"-";
+                String s = p.productName + " " + p.price + "$" + "    " + p.Qty;
 
 
-                Canvas.SetTop(deleteButton[i], top);
-                Canvas.SetLeft(deleteButton[i], 150);
-                canvas.Children.Add(deleteButton[i]);
+                Canvas.SetTop(deleteButton, top);
+                Canvas.SetLeft(deleteButton, 230);
+                canvas.Children.Add(deleteButton);
                 i++;
                 txtMessage = new Text(baseFont,s);
 
                 Canvas.SetTop(txtMessage, top);
                 Canvas.SetLeft(txtMessage, left);
                 canvas.Children.Add(txtMessage);
-                top += 15;
+                top += 25;
             }
 
             if (barcodeError == true)
@@ -296,15 +310,40 @@ namespace BoardApplication
 
         private void imgButton_TouchDownDelete(object sender, TouchEventArgs e)
         {
-                       
             
-
-
-
+            foreach (DictionaryEntry i in deleteProducts)
+            {
+                Image img= i.Value as Image;
+                Image imgSender = sender as Image;
+                if (img.Equals(imgSender))
+                {
+                    img.Bitmap = bitmapPressedButton;
+                    flagDeleteButton = true;
+                    break;
+                }
+            }
+            
         }
 
         private void imgButton_TouchUpDelete(object sender, TouchEventArgs e)
         {
+
+            if (flagDeleteButton == true)
+            {
+                flagDeleteButton = false;
+                foreach (DictionaryEntry d in deleteProducts)
+                {
+                    Image img = d.Value as Image;
+                    Image imgSender = sender as Image;
+                    if (img.Equals(imgSender))
+                    {
+                       
+                        l.Remove(d.Key);
+                        deleteProducts.Remove(d.Key);
+                        createWindowThree();
+                    }
+                }
+            }
             
         }
 
@@ -356,6 +395,7 @@ namespace BoardApplication
 
         void createWindowFour()
         {
+            WindowGlod = 4;
             GT.Timer timer = new GT.Timer(3000); // Create a timer
             Canvas canvas = new Canvas();
             window.Child = canvas;
@@ -400,7 +440,7 @@ namespace BoardApplication
 
         private void createWindowPurchase()
         {
-            
+            WindowGlod = 5;
             byte[] normalButtonByte;
             byte[] pressedButtonByte;
             Canvas canvas = new Canvas();
@@ -423,7 +463,7 @@ namespace BoardApplication
             Canvas.SetTop(imgButton, 110);
             Canvas.SetLeft(imgButton, 80);
             canvas.Children.Add(imgButton);
-            WindowGlod = 2;
+           // WindowGlod = 2;
             imgButton.TouchDown += new TouchEventHandler(imgButton_TouchDown2);
             imgButton.TouchUp += new TouchEventHandler(imgButton_TouchUp2);
         }
@@ -506,15 +546,43 @@ namespace BoardApplication
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
-            Debug.Print("Network is down!");
+            Canvas canvas = new Canvas();
+            window.Child = canvas;
+            Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
+            txtMessage = new Text(baseFont, "THE CONNECTION IS DOWN!");
+            Canvas.SetTop(txtMessage, 100);
+            Canvas.SetLeft(txtMessage, 70);
+            canvas.Children.Add(txtMessage);
         }
 
         void ethernetJ11D_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("Network is up!");
-            Debug.Print("My IP is: " + ethernetJ11D.NetworkSettings.IPAddress);
+         //   Debug.Print("My IP is: " + ethernetJ11D.NetworkSettings.IPAddress);
             IPEndPoint IPaddress = new IPEndPoint(IPAddress.Parse("192.168.1.1"), 8000);
             client = new Client(IPaddress);
+
+            switch (WindowGlod)
+            {
+                case 1:
+                    createWindowOne();
+                break;
+                case 2:
+                    createWindowTwo();
+                break;
+                case 3:
+                    createWindowThree();
+                break;
+                case 4:
+                    createWindowFour();
+                break;
+                case 5:
+                    createWindowPurchase();
+                break;
+                default:
+                    break;
+            }
+
         }
 
     }
