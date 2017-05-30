@@ -48,6 +48,7 @@ namespace BoardApplication
         [System.SerializableAttribute()]
         internal enum FontResources : short
         {
+            Calibri = -7893,
             small = 13070,
             NinaB = 18060,
         }

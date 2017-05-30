@@ -45,6 +45,7 @@ namespace BoardApplication
         private Bitmap bitmapNormalButton;
         private Bitmap bitmapPressedButton;
         private Boolean flagDeleteButton=false;
+        private Boolean firstConnection = true;
 
         // This method is run when the mainboard is powered up or reset.   
         void ProgramStarted()
@@ -123,7 +124,7 @@ namespace BoardApplication
             WindowGlod = 1;
 
             l.Clear();
-            Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
+            Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
             
             
             txtMessage = new Text(baseFont, "Welcome to the automatic cash.");
@@ -138,7 +139,7 @@ namespace BoardApplication
             Canvas.SetLeft(txtMessage, 40);
             txtMessage = new Text(baseFont, "button 'Press Here'!");
             canvas.Children.Add(txtMessage);
-            Canvas.SetTop(txtMessage, 65);
+            Canvas.SetTop(txtMessage, 70);
             Canvas.SetLeft(txtMessage, 90);
 
             normalButtonByte = Resources.GetBytes(Resources.BinaryResources.NormalButton);
@@ -161,13 +162,13 @@ namespace BoardApplication
             WindowGlod = 2;
             Canvas canvas = new Canvas();
             window.Child = canvas;
-            Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
+            Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
                 
             if (globalAuth == false)
             {
                 txtMessage = new Text(baseFont, "SCAN YOUR QR CODE ");
                 Canvas.SetTop(txtMessage, 70);
-                Canvas.SetLeft(txtMessage, 90);
+                Canvas.SetLeft(txtMessage, 75);
                 
                 canvas.Children.Add(txtMessage);
                 txtMessage = new Text(baseFont, "IN FRONT OF ");
@@ -226,7 +227,7 @@ namespace BoardApplication
 
             Canvas canvas = new Canvas();
             window.Child = canvas;
-            Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
+            Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
             txtMessage = new Text(baseFont, "List of goods:");
             Canvas.SetTop(txtMessage, 10);
             Canvas.SetLeft(txtMessage, 30);
@@ -266,7 +267,7 @@ namespace BoardApplication
 
 
                 Canvas.SetTop(deleteButton, top);
-                Canvas.SetLeft(deleteButton, 230);
+                Canvas.SetLeft(deleteButton, 280);
                 canvas.Children.Add(deleteButton);
                 i++;
                 txtMessage = new Text(baseFont,s);
@@ -399,10 +400,10 @@ namespace BoardApplication
             GT.Timer timer = new GT.Timer(3000); // Create a timer
             Canvas canvas = new Canvas();
             window.Child = canvas;
-            Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
+            Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
             txtMessage = new Text(baseFont, "THANKS FOR YOUR PURCHASE!");
             Canvas.SetTop(txtMessage, 100);
-            Canvas.SetLeft(txtMessage, 70);
+            Canvas.SetLeft(txtMessage, 50);
             canvas.Children.Add(txtMessage);
 
             
@@ -447,12 +448,12 @@ namespace BoardApplication
             window.Child = canvas;
             window.Background = new SolidColorBrush(GT.Color.White);
             
-            Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
+            Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
 
             txtMessage = new Text(baseFont, "Welcome " + user.name);
             canvas.Children.Add(txtMessage);
             Canvas.SetTop(txtMessage, 80);
-            Canvas.SetLeft(txtMessage, 40);
+            Canvas.SetLeft(txtMessage, 100);
 
             normalButtonByte = Resources.GetBytes(Resources.BinaryResources.startBuying);
             pressedButtonByte = Resources.GetBytes(Resources.BinaryResources.PressedStartBuying);
@@ -546,13 +547,17 @@ namespace BoardApplication
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
-            Canvas canvas = new Canvas();
-            window.Child = canvas;
-            Font baseFont = Resources.GetFont(Resources.FontResources.NinaB);
-            txtMessage = new Text(baseFont, "THE CONNECTION IS DOWN!");
-            Canvas.SetTop(txtMessage, 100);
-            Canvas.SetLeft(txtMessage, 70);
-            canvas.Children.Add(txtMessage);
+            if (firstConnection == false)
+            {
+                Canvas canvas = new Canvas();
+                window.Child = canvas;
+                Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
+                txtMessage = new Text(baseFont, "THE CONNECTION IS DOWN!");
+                Canvas.SetTop(txtMessage, 100);
+                Canvas.SetLeft(txtMessage, 70);
+                canvas.Children.Add(txtMessage);
+            }
+            else firstConnection = false;
         }
 
         void ethernetJ11D_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)

@@ -130,6 +130,7 @@
       <DependentUpon>Program.gadgeteer</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <None Include="Resources\Calibri.tinyfnt" />
     <None Include="Resources\NinaB.tinyfnt" />
     <None Include="Resources\small.tinyfnt" />
   </ItemGroup>
