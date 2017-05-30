@@ -9,9 +9,9 @@ namespace ServerApplicationWPF.Model
 
     public class Receipt
     {
-        // TODO consider Customer
+        // the string that identifies the customer that produced the receipt
         public string CustomerId { get; private set; }
-        // TODO consider Dictionary<Product, int>
+        // for each productId, store the quantity
         public Dictionary<string, int> Items { get; private set; }
 
         public Receipt(string customerId)
