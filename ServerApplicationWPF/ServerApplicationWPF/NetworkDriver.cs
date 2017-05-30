@@ -97,8 +97,9 @@ namespace ServerApplicationWPF
                     JsonConvert.DeserializeObject(req);
                     type = NetworkRequest.RequestType.ReceiptStorageRequest;
                 }
-                catch (JsonException e)
+                catch (JsonException)
                 {
+                    // if it is not json, it is a simple byte[] with image inside
                     type = NetworkRequest.RequestType.ImageProcessingRequest;
                 }
                 
