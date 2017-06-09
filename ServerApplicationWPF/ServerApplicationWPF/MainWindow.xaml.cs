@@ -127,10 +127,10 @@ namespace ServerApplicationWPF
                 {
                     string req = UDPNetwork.Utils.BytesToString(request.Payload);
                     JObject receipt = JObject.Parse(req);
+                    // get customerId
                     String userId = receipt["UserID"].ToString();
                     JArray list = receipt["List"] as JArray;
                     IList<JToken> products = list.Children().ToList();
-                    // TODO get customer id
                     Receipt receiptObj = new Receipt(userId);
 
                     foreach (var product in products)
@@ -144,7 +144,7 @@ namespace ServerApplicationWPF
                     }
 
                     dbConnect.InsertReceipt(receiptObj);
-                    // TODO return ok to the board
+                    // return ok to the board
                     return new NetworkResponse(NetworkResponse.ResponseType.ReceiptStorageResult, Utils.StringToBytes("OK"));
                 }
                 catch (Exception e)
@@ -160,18 +160,6 @@ namespace ServerApplicationWPF
                 Console.WriteLine("Unknown request type");
                 return new NetworkResponse(NetworkResponse.ResponseType.ReceiptStorageError, Utils.StringToBytes("Error"));
             }
-        }
-
-        string getQr(string text)
-        {
-            // TODO
-            return null;
-        }
-
-        string getProductID(string text)
-        {
-            // TODO
-            return null;
         }
 
         private void displayImage(Bitmap image)

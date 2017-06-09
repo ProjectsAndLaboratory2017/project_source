@@ -13,8 +13,7 @@ namespace ServerApplicationWPF
     public class NetworkDriver
     {
         public Thread SocketThread { get; private set; }
-        // TODO change the object type to the most appropriate image type
-        // TODO the return type is what needs to be sent back to the board
+        // a delegate that will set by the caller of the constructor and will handle the transformation from request to response
         public delegate NetworkResponse RequestToResponseCallbackType(NetworkRequest request);
         public delegate void MessageCallbackType(string message);
 
@@ -45,7 +44,6 @@ namespace ServerApplicationWPF
                 {
                     messageCallback("Waiting connections");
                     int token = server.Accept();
-                    // TODO get details from accepted connection
                     messageCallback("Accepted connection. Gave token: " + token);
 
                     NetworkRequest request = readRequest(server, token);
@@ -84,7 +82,7 @@ namespace ServerApplicationWPF
 
         private NetworkRequest readRequest(UDPNetwork.Server server, int token)
         {
-            // TODO read from network
+            // read from network
             NetworkRequest.RequestType type;
             byte[] payload;
 
@@ -116,7 +114,7 @@ namespace ServerApplicationWPF
         {
             try
             {
-                // TODO for now only sending payload
+                // sending payload, the client will understand parsing JSON
                 byte[] payload = response.Payload;
 
                 server.SendData(payload, token);

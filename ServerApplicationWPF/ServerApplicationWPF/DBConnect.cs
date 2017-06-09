@@ -30,6 +30,7 @@ class DataManager
         connection = new MySqlConnection(connectionString);
     }
 
+    // TODO use transactions
     //open connection to database
     private bool OpenConnection()
     {
@@ -112,7 +113,7 @@ class DataManager
             cmd.Parameters.AddWithValue("@receipt", receiptId);
             cmd.Parameters.Add(productId);
             cmd.Parameters.AddWithValue("@customer", receipt.CustomerId);
-            cmd.Parameters.AddWithValue("@date", System.DateTime.Now.GetDateTimeFormats('d')[0]);
+            cmd.Parameters.AddWithValue("@date", System.DateTime.Now.ToString("yyyy-MM-dd"));
             cmd.Parameters.Add(quantity);
             foreach (var item in receipt.Items)
             {
