@@ -52,6 +52,7 @@ namespace BoardApplication
         {    
             // Use Debug.Print to show messages in Visual Studio's "Output" window during debugging.
              String[] array = {"192.168.1.1"};
+             multicolorLED.TurnWhite();
              ethernetJ11D.NetworkInterface.Open();
              ethernetJ11D.NetworkInterface.EnableStaticIP("192.168.1.2", "255.255.255.0", "192.168.1.1");
              ethernetJ11D.NetworkInterface.EnableStaticDns(array);
@@ -73,14 +74,14 @@ namespace BoardApplication
             Debug.Print("Program Started");
 
             //welcome tune
-        /*    
+           
             Tunes.MusicNote[] notes = new Tunes.MusicNote[4];
             notes[0] = new Tunes.MusicNote(Tunes.Tone.C4, 150);
             notes[1] = new Tunes.MusicNote(Tunes.Tone.E4, 150);
             notes[2] = new Tunes.MusicNote(Tunes.Tone.G4, 150);
             notes[3] = new Tunes.MusicNote(Tunes.Tone.C5, 300);
 
-            tunes.Play(notes);*/
+            tunes.Play(notes);
 
             window = displayTE35.WPFWindow;
 
@@ -147,7 +148,7 @@ namespace BoardApplication
             normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
             pressedButton = new Bitmap(pressedButtonByte, Bitmap.BitmapImageType.Jpeg);
 
-            normalButton.SetPixel(154, 55, GT.Color.Blue);
+            //normalButton.SetPixel(154, 55, GT.Color.Blue);
             imgButton = new Image(normalButton);
             canvas.Children.Add(imgButton);
             Canvas.SetTop(imgButton, 110);
@@ -250,7 +251,7 @@ namespace BoardApplication
                 bitmapPressedButton = new Bitmap(deletePressedButtonByte, Bitmap.BitmapImageType.Jpeg);
                 //bitmapNormalButton.SetPixel(10, 10, GT.Color.Blue);
 
-                bitmapNormalButton.SetPixel(54, 60, GT.Color.Blue);
+                //bitmapNormalButton.SetPixel(25, 27, GT.Color.Blue);
                 deleteButton = new Image(bitmapNormalButton);
 
 
@@ -263,7 +264,7 @@ namespace BoardApplication
                 deleteProducts.Add(d.Key, deleteButton);
                 
                 ProductInfo p = d.Value as ProductInfo;
-                String s = p.productName + " " + p.price + "$" + "    " + p.Qty;
+                String s = p.productName + " " + p.price.ToString("f") + "$" + "    " + p.Qty;
 
 
                 Canvas.SetTop(deleteButton, top);
@@ -280,6 +281,11 @@ namespace BoardApplication
 
             if (barcodeError == true)
             {
+                Tunes.MusicNote[] notes = new Tunes.MusicNote[1];
+                notes[0] = new Tunes.MusicNote(Tunes.Tone.D2, 150);
+                
+                tunes.Play(notes);
+
                 txtMessage = new Text(baseFont, stringError);
                 Canvas.SetTop(txtMessage, top);
                 Canvas.SetLeft(txtMessage, left);
@@ -292,7 +298,7 @@ namespace BoardApplication
             pressedButtonByte = Resources.GetBytes(Resources.BinaryResources.payButtonPressed);
             normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
             pressedButton = new Bitmap(pressedButtonByte, Bitmap.BitmapImageType.Jpeg);
-            normalButton.SetPixel(154, 55, GT.Color.Blue);
+            //normalButton.SetPixel(154, 55, GT.Color.Blue);
             imgButton = new Image(normalButton);
             Canvas.SetTop(imgButton, 170);
             Canvas.SetLeft(imgButton, 80);
@@ -397,6 +403,19 @@ namespace BoardApplication
         void createWindowFour()
         {
             WindowGlod = 4;
+
+            Tunes.MusicNote[] notes = new Tunes.MusicNote[7];
+            notes[0] = new Tunes.MusicNote(Tunes.Tone.C5, 100);
+            notes[1] = new Tunes.MusicNote(Tunes.Tone.Rest, 50);
+            notes[2] = new Tunes.MusicNote(Tunes.Tone.C5, 100);
+            notes[3] = new Tunes.MusicNote(Tunes.Tone.Rest, 50);
+            notes[4] = new Tunes.MusicNote(Tunes.Tone.C5, 100);
+            notes[5] = new Tunes.MusicNote(Tunes.Tone.Rest, 50);
+            notes[6] = new Tunes.MusicNote(Tunes.Tone.C5, 300);
+            
+            tunes.Play(notes);
+
+
             GT.Timer timer = new GT.Timer(3000); // Create a timer
             Canvas canvas = new Canvas();
             window.Child = canvas;
@@ -427,14 +446,23 @@ namespace BoardApplication
 
                 t.Start();
                 t.Join();
+
+        
+
                 if (WindowGlod == 3)
                     createWindowThree();
                 else
                 {
-                    if (user == null)
+                    
+                    if ( user==null || !user.Type.Equals("user"))
+                    {
+                        globalAuth = true;
                         createWindowTwo();
-                    else createWindowPurchase();
+                    }
+                    else
+                        createWindowPurchase();
                 }
+
             }
             else firstPicture = false;
         }
@@ -515,34 +543,50 @@ namespace BoardApplication
                     user.name = hashTable["Name"] as String;
                     user.surname = hashTable["Surname"] as String;
                     user.UserID = hashTable["ID"] as String;
+                    user.Type = hashTable["Type"] as String; 
                 }
                 else
                 {
                     ProductInfo prod = new ProductInfo();
-                    prod.IDProduct = hashTable["ID"] as String;
-                    if (!l.Contains(prod.IDProduct))
+
+                    prod.Type = hashTable["Type"] as String;
+
+                    if (!prod.Type.Equals("product"))
                     {
-                        prod.productName = hashTable["Product_name"] as String;
-                        String priceString = hashTable["Price"] as String;
-                        prod.price = Double.Parse(priceString);
-                        String pointString = hashTable["Points"] as String;
-                        prod.points = Double.Parse(pointString);
-                        prod.Qty++;
-                        l.Add(prod.IDProduct, prod);
+                        barcodeError = true;
                     }
-                    else
-                    {
-                        (l[prod.IDProduct] as ProductInfo).Qty++;
+                    else {
+                        prod.IDProduct = hashTable["ID"] as String;
+                        if (!l.Contains(prod.IDProduct))
+                        {
+                            prod.productName = hashTable["Product_name"] as String;
+                            String priceString = hashTable["Price"] as String;
+                            prod.price = Double.Parse(priceString);
+                            String pointString = hashTable["Points"] as String;
+                            prod.points = Double.Parse(pointString);
+                            prod.Qty++;
+                            l.Add(prod.IDProduct, prod);
+                        }
+                        else
+                        {
+                            (l[prod.IDProduct] as ProductInfo).Qty++;
+                        }
+                   
                     }
+                    
                 }
             }
         }
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
         {
-            // tunes.Play(1100, 300);
-            if (WindowGlod == 3 || WindowGlod == 2) 
-                camera.TakePicture();      
+
+            if (WindowGlod == 3 || WindowGlod == 2)
+            {
+                tunes.Play(1100, 300);
+                camera.TakePicture();
+
+            }
         }
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
