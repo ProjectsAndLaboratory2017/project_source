@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,24 +9,30 @@ namespace ServerApplicationWPF.Model
 {
     public class Product
     {
-        public string ProductId { get; private set; }
+        public string ID { get; private set; }
         public string Barcode { get; private set; }
-        public string Name { get; private set; }
+        public string Product_name { get; private set; }
         public double Price { get; private set; }
         public int Points { get; private set; }
+        public int StoreQty { get; private set; }
+        public String Type { get; private set; }
 
-        public Product(string id, string barcode, string name, double price, int points)
+        public Product(string id, string barcode, string name, double price, int points, int storeQty)
         {
-            ProductId = id;
+            ID = id;
             Barcode = barcode;
-            Name = name;
+            Product_name = name;
             Price = price;
             Points = points;
+            StoreQty = storeQty;
+            Type = "product";
         }
 
         public override string ToString()
         {
-            return "{\"ID\":\"" + ProductId + "\",\"Product_name\":\"" + Name + "\",\"Price\":\"" + Price + "\",\"Points\":\"" + Points + "\"}";
+            //return JsonConvert.SerializeObject(this);
+            // TODO remove this crap, use properly json
+            return "{\"Type\":\"product\",\"ID\":\"" + ID + "\",\"Product_name\":\"" + Product_name + "\",\"Price\":\"" + Price + "\",\"Points\":\"" + Points + "\"}";
         }
     }
 }

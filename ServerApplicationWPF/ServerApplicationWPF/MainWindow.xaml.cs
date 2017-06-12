@@ -106,9 +106,14 @@ namespace ServerApplicationWPF
                             messageProcessing("No products found");
                             response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Utils.StringToBytes("Error"));
                         }
+                        else if (p.StoreQty < 1)
+                        {
+                            messageProcessing("Product quantity less than 1");
+                            response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Utils.StringToBytes("Error"));
+                        }
                         else
                         {
-                            messageProcessing("Product found: " + p.Name);
+                            messageProcessing("Product found: " + p.Product_name);
                             response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Utils.StringToBytes(p.ToString()));
                         }
                     }
@@ -190,7 +195,7 @@ namespace ServerApplicationWPF
         private void button_Click(object sender, RoutedEventArgs e)
         {
             Product product = dbConnect.getProductByBarcode(barcode_txt.Text);
-            db_output.Text = product.Name;
+            db_output.Text = product.Product_name;
         }
 
         private Bitmap rotateImage90(Bitmap b)
