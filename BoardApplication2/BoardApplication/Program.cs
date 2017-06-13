@@ -183,6 +183,8 @@ namespace BoardApplication
             }
             else
             {
+                tunes.Play(new Tunes.MusicNote(Tunes.Tone.D3, 200));
+
                 txtMessage = new Text(baseFont, "The authentication is failed.");
                 Canvas.SetTop(txtMessage, 30);
                 Canvas.SetLeft(txtMessage, 50);
@@ -282,7 +284,7 @@ namespace BoardApplication
             if (barcodeError == true)
             {
                 Tunes.MusicNote[] notes = new Tunes.MusicNote[1];
-                notes[0] = new Tunes.MusicNote(Tunes.Tone.D2, 150);
+                notes[0] = new Tunes.MusicNote(Tunes.Tone.D3, 150);
                 
                 tunes.Play(notes);
 
@@ -497,6 +499,19 @@ namespace BoardApplication
             imgButton.TouchUp += new TouchEventHandler(imgButton_TouchUp2);
         }
 
+        object createWindowError(object foo)
+        {
+            Canvas canvas = new Canvas();
+            window.Child = canvas;
+            window.Background = new SolidColorBrush(GT.Color.Red);
+            Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
+            txtMessage = new Text(baseFont, "THE CONNECTION IS DOWN!");
+            Canvas.SetTop(txtMessage, 100);
+            Canvas.SetLeft(txtMessage, 70);
+            canvas.Children.Add(txtMessage);
+            return null;
+        }
+
         private void configurePicture()
         {
             byte[] result = new byte[65536];
@@ -505,21 +520,33 @@ namespace BoardApplication
 
             Boolean receivedToken = false;
             int token = 0;
+            byte[] receivedMessage = null;
             while (receivedToken == false)
             {
                 try
                 {
                     token = client.AskToken();
                     client.SendData(result, token);
+                    receivedMessage = client.ReceiveData(token);
                     receivedToken = true;
                 }
                 catch (Exception e)
                 {
-
+                    if (!ethernetJ11D.IsNetworkUp)
+                    {
+                        //tunes.Play(new Tunes.MusicNote(Tunes.Tone.A3, 200));
+                        break;
+                        //Dispatcher.CurrentDispatcher.BeginInvoke(createWindowError, null);
+                        //Thread.Sleep(1000);
+                    }
                 }
             }
-
-            byte[] receivedMessage = client.ReceiveData(token);
+            if (receivedMessage == null)
+            {
+                barcodeError = true;
+                return;
+            }
+            
             //Debug.Print(Utils.BytesToString(receivedMessage));
             if (barcodeError == true)
             {
@@ -540,10 +567,23 @@ namespace BoardApplication
                 if (WindowGlod == 2)
                 {
                     user = new UserInfo();
-                    user.name = hashTable["Name"] as String;
-                    user.surname = hashTable["Surname"] as String;
-                    user.UserID = hashTable["ID"] as String;
-                    user.Type = hashTable["Type"] as String; 
+                    user.Type = hashTable["Type"] as String;
+                    if (user.Type.Equals("user"))
+                    {
+                        Tunes.MusicNote[] notes = new Tunes.MusicNote[4];
+                        notes[0] = new Tunes.MusicNote(Tunes.Tone.C5, 50);
+                        notes[1] = new Tunes.MusicNote(Tunes.Tone.C4, 50);
+                        notes[2] = new Tunes.MusicNote(Tunes.Tone.E4, 50);
+                        notes[3] = new Tunes.MusicNote(Tunes.Tone.G4, 100);
+                        tunes.Play(notes);
+                        
+                        user.name = hashTable["Name"] as String;
+                        user.surname = hashTable["Surname"] as String;
+                        user.UserID = hashTable["ID"] as String;
+                    } else
+                    {
+                        user = null;
+                    }
                 }
                 else
                 {
@@ -556,6 +596,13 @@ namespace BoardApplication
                         barcodeError = true;
                     }
                     else {
+                        Tunes.MusicNote[] notes = new Tunes.MusicNote[4];
+                        notes[0] = new Tunes.MusicNote(Tunes.Tone.C5, 50);
+                        notes[1] = new Tunes.MusicNote(Tunes.Tone.C4, 50);
+                        notes[2] = new Tunes.MusicNote(Tunes.Tone.E4, 50);
+                        notes[3] = new Tunes.MusicNote(Tunes.Tone.G4, 100);
+                        tunes.Play(notes);
+
                         prod.IDProduct = hashTable["ID"] as String;
                         if (!l.Contains(prod.IDProduct))
                         {
@@ -583,25 +630,19 @@ namespace BoardApplication
 
             if (WindowGlod == 3 || WindowGlod == 2)
             {
-                tunes.Play(1100, 300);
-                camera.TakePicture();
+
+                if (camera.CameraReady)
+                {
+                    camera.TakePicture();
+                    tunes.Play(1100, 300);
+                }
 
             }
         }
 
         void ethernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
-            if (firstConnection == false)
-            {
-                Canvas canvas = new Canvas();
-                window.Child = canvas;
-                Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
-                txtMessage = new Text(baseFont, "THE CONNECTION IS DOWN!");
-                Canvas.SetTop(txtMessage, 100);
-                Canvas.SetLeft(txtMessage, 70);
-                canvas.Children.Add(txtMessage);
-            }
-            else firstConnection = false;
+            createWindowError(null);
         }
 
         void ethernetJ11D_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
@@ -610,6 +651,7 @@ namespace BoardApplication
          //   Debug.Print("My IP is: " + ethernetJ11D.NetworkSettings.IPAddress);
             IPEndPoint IPaddress = new IPEndPoint(IPAddress.Parse("192.168.1.1"), 8000);
             client = new Client(IPaddress);
+            window.Background = new SolidColorBrush(GT.Color.White);
 
             switch (WindowGlod)
             {
