@@ -46,6 +46,7 @@ namespace BoardApplication
         private Bitmap bitmapPressedButton;
         private Boolean flagDeleteButton=false;
         private Boolean firstConnection = true;
+        private Boolean connection = true;
 
         // This method is run when the mainboard is powered up or reset.   
         void ProgramStarted()
@@ -262,7 +263,7 @@ namespace BoardApplication
                 deleteButton.TouchUp += new TouchEventHandler(imgButton_TouchUpDelete);
                 if (deleteProducts.Contains(d.Key))
                     deleteProducts.Remove(d.Key);
-
+                
                 deleteProducts.Add(d.Key, deleteButton);
                 
                 ProductInfo p = d.Value as ProductInfo;
@@ -346,9 +347,20 @@ namespace BoardApplication
                     Image imgSender = sender as Image;
                     if (img.Equals(imgSender))
                     {
-                       
-                        l.Remove(d.Key);
-                        deleteProducts.Remove(d.Key);
+
+                        ProductInfo s = l[d.Key] as ProductInfo;
+
+                        if (s.Qty == 1)
+                        {
+                            l.Remove(d.Key);
+                            deleteProducts.Remove(d.Key);
+                        }
+                        else if(s.Qty > 1)
+                        {
+                            s.Qty--;
+                            l[d.Key] = s;
+                        }
+
                         createWindowThree();
                     }
                 }
@@ -407,13 +419,13 @@ namespace BoardApplication
             WindowGlod = 4;
 
             Tunes.MusicNote[] notes = new Tunes.MusicNote[7];
-            notes[0] = new Tunes.MusicNote(Tunes.Tone.C5, 100);
-            notes[1] = new Tunes.MusicNote(Tunes.Tone.Rest, 50);
-            notes[2] = new Tunes.MusicNote(Tunes.Tone.C5, 100);
-            notes[3] = new Tunes.MusicNote(Tunes.Tone.Rest, 50);
-            notes[4] = new Tunes.MusicNote(Tunes.Tone.C5, 100);
-            notes[5] = new Tunes.MusicNote(Tunes.Tone.Rest, 50);
-            notes[6] = new Tunes.MusicNote(Tunes.Tone.C5, 300);
+            notes[0] = new Tunes.MusicNote(Tunes.Tone.C5, 50);
+            notes[1] = new Tunes.MusicNote(Tunes.Tone.Rest, 25);
+            notes[2] = new Tunes.MusicNote(Tunes.Tone.C5, 50);
+            notes[3] = new Tunes.MusicNote(Tunes.Tone.Rest, 25);
+            notes[4] = new Tunes.MusicNote(Tunes.Tone.C5, 50);
+            notes[5] = new Tunes.MusicNote(Tunes.Tone.Rest, 25);
+            notes[6] = new Tunes.MusicNote(Tunes.Tone.C5, 200);
             
             tunes.Play(notes);
 
@@ -517,6 +529,7 @@ namespace BoardApplication
             byte[] result = new byte[65536];
             int read = 0;
             result = picture.PictureData;
+            Boolean wrongSituation = false;
 
             Boolean receivedToken = false;
             int token = 0;
@@ -534,6 +547,7 @@ namespace BoardApplication
                 {
                     if (!ethernetJ11D.IsNetworkUp)
                     {
+
                         //tunes.Play(new Tunes.MusicNote(Tunes.Tone.A3, 200));
                         break;
                         //Dispatcher.CurrentDispatcher.BeginInvoke(createWindowError, null);
@@ -547,7 +561,7 @@ namespace BoardApplication
                 return;
             }
             
-            //Debug.Print(Utils.BytesToString(receivedMessage));
+                        
             if (barcodeError == true)
             {
              //   l.Remove("Error");
