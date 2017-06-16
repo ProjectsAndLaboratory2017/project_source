@@ -14,7 +14,7 @@ namespace BoardApplication
         public static string TOKEN_REQUEST = "give_me_a_token";
         public static string ACK = "ack";
         public static string NACK = "nack";
-        public static int RECEIVE_TIMEOUT = 1000; // timeout between net request and response/ack or between token generation and usage
+        public static int RECEIVE_TIMEOUT = 500; // timeout between net request and response/ack or between token generation and usage
         public static int FRAGMENT_TIMEOUT = 400; // 10 ms for retransimssion
         public static int MAX_RETRY = 10;
 

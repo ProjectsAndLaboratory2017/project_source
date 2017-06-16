@@ -208,7 +208,6 @@ namespace BoardApplication
         {
             imgButton.Bitmap = pressedButton;
             flagButtonPressHere = true;
-
         }
 
         //WINDOW THREE
@@ -273,8 +272,16 @@ namespace BoardApplication
             Canvas.SetLeft(imgButton, 80);
             canvas.Children.Add(imgButton);
 
+
             imgButton.TouchDown += new TouchEventHandler(imgButton_TouchDown3);
             imgButton.TouchUp += new TouchEventHandler(imgButton_TouchUp3);
+
+            //I send the list to the web service:
+         /*   for (i = 0; i < l.Count; i++)
+            {
+                byte[] productBytes = Encoding.UTF8.GetBytes(l[i].ToString());
+                client.sendBytes(productBytes);
+            }            */
         }
 
         //Touch linked to window three
@@ -313,9 +320,23 @@ namespace BoardApplication
         {
             byte[] result = new byte[65536];
             int read = 0;
+            result = picture.PictureData;
 
-            using (var req = HttpWebRequest.Create("http://192.168.1.1/") as HttpWebRequest)
+          //  client = new Client();
+
+          //  client.sendBytes(result);
+
+          using (var req = HttpWebRequest.Create("http://192.168.1.1:7629/barcode/recognize") as HttpWebRequest)
             {
+                req.Method = "POST";
+                req.ContentType = "application/octet-stream";
+                req.Accept = "application/json";
+                req.ContentLength = result.Length;
+                //req.Headers.Add("Host: localhost");
+
+                req.GetRequestStream().Write(result,0,result.Length);
+                req.GetRequestStream().Close();
+
                 using (var res = req.GetResponse() as HttpWebResponse)
                 {
                     using (var stream = res.GetResponseStream())

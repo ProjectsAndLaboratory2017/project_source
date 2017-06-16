@@ -10,5 +10,6 @@ namespace BoardApplication
         public Double points{get;set;}
         public Double Qty{get;set;}
         public String IDProduct{get;set;}
+        public String Type { get; set; }
     }
 }

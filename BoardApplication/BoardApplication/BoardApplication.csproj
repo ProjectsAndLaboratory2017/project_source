@@ -39,7 +39,12 @@
   <!-- Everything below here is custom to .NET MF / Gadgeteer template-->
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
-    <Compile Include="ConnectionManagement.cs" />
+    <Compile Include="Client.cs" />
+    <Compile Include="JsonSerialize\DateTimeExtensions.cs" />
+    <Compile Include="JsonSerialize\JsonParser.cs" />
+    <Compile Include="JsonSerialize\JsonSerializer.cs" />
+    <Compile Include="JsonSerialize\NumberExtensions.cs" />
+    <Compile Include="JsonSerialize\StringExtensions.cs" />
     <Compile Include="Program.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -101,6 +106,7 @@
     <Reference Include="Microsoft.SPOT.TinyCore" />
     <Reference Include="mscorlib" />
     <Reference Include="System" />
+    <Reference Include="System.Http" />
     <Reference Include="System.IO" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +123,7 @@
     </None>
     <None Include="Program.gadgeteer.diagram">
       <DependentUpon>Program.gadgeteer</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Resources\NinaB.tinyfnt" />
     <None Include="Resources\small.tinyfnt" />
@@ -139,4 +146,5 @@
   <ItemGroup>
     <None Include="Resources\startBuying.jpg" />
   </ItemGroup>
+  <ItemGroup />
 </Project>

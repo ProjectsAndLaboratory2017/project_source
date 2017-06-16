@@ -125,6 +125,7 @@ class DataManager
             }
 
             //close connection
+            // TODO this should be in finally block
             this.CloseConnection();
         }
     }
@@ -133,6 +134,8 @@ class DataManager
     public Product getProductByBarcode(string barcode)
     {
         string query = "SELECT * FROM product where barcode=@text";
+
+        try { 
 
         //Open connection
         if (this.OpenConnection() == true)
@@ -151,14 +154,11 @@ class DataManager
             Product result = null;
             if (dataReader.HasRows)
             {
-                result = new Product(dataReader["ProductID"] + "", dataReader["Barcode"] + "", dataReader["Name"] + "", double.Parse(dataReader["Price"] + ""), int.Parse(dataReader["points"] + ""));
+                result = new Product(dataReader["ProductID"] + "", dataReader["Barcode"] + "", dataReader["Name"] + "", double.Parse(dataReader["Price"] + ""), int.Parse(dataReader["Points"] + ""), int.Parse(dataReader["StoreQty"] + ""));
             }
 
             //close Data Reader
             dataReader.Close();
-
-            //close Connection
-            this.CloseConnection();
 
             //return list to be displayed
             return result;
@@ -166,6 +166,11 @@ class DataManager
         else
         {
             return null;
+        }
+        } finally
+        {
+            //close Connection
+            this.CloseConnection();
         }
     }
 

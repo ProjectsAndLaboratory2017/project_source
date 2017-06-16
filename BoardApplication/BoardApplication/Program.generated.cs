@@ -53,6 +53,8 @@ namespace BoardApplication {
             // Starts Dispatcher
             p.Run();
         }
+
+       
         
         private void InitializeModules() {
             this.camera = new GTM.GHIElectronics.Camera(3);

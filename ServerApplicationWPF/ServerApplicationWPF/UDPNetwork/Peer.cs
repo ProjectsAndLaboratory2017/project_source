@@ -46,30 +46,34 @@ namespace ServerApplicationWPF.UDPNetwork
                         sent = socket.SendTo(dgram.Serialized, remoteEndpoint);
 
                         // now wait for the ACK a limited time
-                        socket.ReceiveTimeout = Utils.FRAGMENT_TIMEOUT;
-                        byte[] datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
-                        TokenAndData response_parsed = new TokenAndData(datagram);
-                        if (response_parsed.Token != token)
+                        //if (sequenceNumber % 2 == 1)
                         {
-                            retry = 0;
-                            throw new Exception("The server answered with another token: " + response_parsed.Token);
-                        }
-                        if (response_parsed.SequenceNumber != sequenceNumber)
-                        {
-                            if (response_parsed.SequenceNumber < sequenceNumber)
+                            socket.ReceiveTimeout = Utils.FRAGMENT_TIMEOUT;
+                            byte[] datagram = Utils.ReceiveFrom(socket, ref remoteEndpoint);
+                            TokenAndData response_parsed = new TokenAndData(datagram);
+                            if (response_parsed.Token != token)
                             {
-                                // already received
-                                continue;
+                                retry = 0;
+                                throw new Exception("The server answered with another token: " + response_parsed.Token);
                             }
-                            throw new Exception("The server answered with a wrong sequence number " + response_parsed.SequenceNumber);
+                            if (response_parsed.SequenceNumber != sequenceNumber)
+                            {
+                                if (response_parsed.SequenceNumber < sequenceNumber)
+                                {
+                                    // already received
+                                    continue;
+                                }
+                                throw new Exception("The server answered with a wrong sequence number " + response_parsed.SequenceNumber);
+                            }
+                            ack_string = Utils.BytesToString(response_parsed.Data);
                         }
-                        ack_string = Utils.BytesToString(response_parsed.Data);
                     }
                     catch (SocketException e)
                     {
                         //
+                        Console.WriteLine("Catched SocketException sending data: " + e.Message);
                     }
-                    //retry--;
+                    retry--;
                 } while (ack_string != Utils.ACK && retry > 0);
                 if (retry <= 0)
                 {
@@ -123,6 +127,7 @@ namespace ServerApplicationWPF.UDPNetwork
                             // send anyway ack (maybe lost it before)
                             TokenAndData nack = new TokenAndData(token, data_parsed.SequenceNumber, Utils.StringToBytes(Utils.ACK));
                             socket.SendTo(nack.Serialized, remoteEndpoint);
+                            //retry--;
                             continue;
                         }
                         throw new Exception("Wrong sequence number " + dgram_parsed.SequenceNumber);
@@ -131,15 +136,20 @@ namespace ServerApplicationWPF.UDPNetwork
                     start_offset += data_parsed.Data.Length;
                     toRead -= data_parsed.Data.Length;
                     // now send the ACK
-                    TokenAndData ack = new TokenAndData(token, sequenceNumber, Utils.StringToBytes(Utils.ACK));
-                    socket.SendTo(ack.Serialized, remoteEndpoint);
+                    //if (sequenceNumber % 2 == 1)
+                    {
+                        TokenAndData ack = new TokenAndData(token, sequenceNumber, Utils.StringToBytes(Utils.ACK));
+                        socket.SendTo(ack.Serialized, remoteEndpoint);
+                    }
                     sequenceNumber++;
+                    retry = Utils.MAX_RETRY;
                 }
                 catch (Exception e)
                 {
                     // some exception (wrong token or timeout expired)
                     // ask again for the same fragment
-                    //retry--;
+                    retry--;
+                    Console.WriteLine("exception e: " + e.Message);
                     TokenAndData nack = new TokenAndData(token, sequenceNumber, Utils.StringToBytes(Utils.NACK));
                     socket.SendTo(nack.Serialized, remoteEndpoint);
                 }
