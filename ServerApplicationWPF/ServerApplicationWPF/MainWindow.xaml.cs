@@ -32,7 +32,7 @@ namespace ServerApplicationWPF
     public partial class MainWindow : Window
     {
         private NetworkDriver networkDriver;
-        private CodeScanner codeScanner;
+        private IBarcodeReader reader;
         private DataManager dbConnect;
 
         private delegate void StringConsumer(string s);
@@ -43,7 +43,7 @@ namespace ServerApplicationWPF
         public MainWindow()
         {
             InitializeComponent();
-            codeScanner = new CodeScanner();
+            reader = new BarcodeReader();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
             dbConnect = new DataManager();
             onlineProductManager = new OnlineProductManager(dbConnect, barcodesToBeSearchedOnline);
@@ -66,7 +66,7 @@ namespace ServerApplicationWPF
                 // do the barcode scan
                 ArrayList barcodes = new ArrayList();
                 //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
-                IBarcodeReader reader = new BarcodeReader();
+                
                 var result = reader.Decode(image);
 
                 //string result = codeScanner.ScanPage(image);
