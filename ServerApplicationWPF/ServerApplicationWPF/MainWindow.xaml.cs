@@ -42,10 +42,29 @@ namespace ServerApplicationWPF
         private OnlineProductManager onlineProductManager;
         public MainWindow()
         {
+            dbConnect = null;
+            do
+            {
+                try
+                {
+                    dbConnect = new DataManager();
+                    break;
+                }
+                catch (Exception e)
+                {
+                    var messageBoxResult = MessageBox.Show(e.Message + "\nDo you want to retry to connect?", "Error starting the application", MessageBoxButton.YesNo);
+                    if (messageBoxResult != MessageBoxResult.Yes)
+                    {
+                        Application.Current.Shutdown();
+                        return;
+                    }
+                }
+            } while (dbConnect == null);
+
+
             InitializeComponent();
             reader = new BarcodeReader();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
-            dbConnect = new DataManager();
             onlineProductManager = new OnlineProductManager(dbConnect, barcodesToBeSearchedOnline);
         }
 
@@ -66,7 +85,7 @@ namespace ServerApplicationWPF
                 // do the barcode scan
                 ArrayList barcodes = new ArrayList();
                 //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
-                
+
                 var result = reader.Decode(image);
 
                 //string result = codeScanner.ScanPage(image);

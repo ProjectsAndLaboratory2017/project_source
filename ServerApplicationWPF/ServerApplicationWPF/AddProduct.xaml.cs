@@ -69,13 +69,17 @@ namespace ServerApplicationWPF
             {
                 MessageBox.Show("Provide a name for the product");
             }
-            else if (dataManager.insertProduct(product))
-            {
-                Close();
-            }
             else
             {
-                MessageBox.Show("Error while inserting the new product in the database!");
+                try
+                {
+                    dataManager.insertProduct(product);
+                    Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error while inserting the new product in the database!\n" + ex.Message);
+                }
             }
         }
     }
