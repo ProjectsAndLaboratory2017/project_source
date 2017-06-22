@@ -2,7 +2,7 @@
 using ServerApplicationWPF.Model;
 using System.Collections.Generic;
 
-class DataManager
+public class DataManager
 {
     private MySqlConnection connection;
     private string server;
@@ -31,6 +31,10 @@ class DataManager
     }
 
     // TODO use transactions
+    private MySqlTransaction getTransaction()
+    {
+        return connection.BeginTransaction();
+    }
     //open connection to database
     private bool OpenConnection()
     {
@@ -135,39 +139,41 @@ class DataManager
     {
         string query = "SELECT * FROM product where barcode=@text";
 
-        try { 
-
-        //Open connection
-        if (this.OpenConnection() == true)
+        try
         {
-            //Create Command
-            MySqlCommand cmd = new MySqlCommand(query, connection);
-            //prepare the statement to avoid SQL injection
-            cmd.Prepare();
-            // put parameter
-            cmd.Parameters.AddWithValue("@text", barcode);
-            //Create a data reader and Execute the command
-            MySqlDataReader dataReader = cmd.ExecuteReader();
 
-            //Read the data and store them in the list
-            dataReader.Read();
-            Product result = null;
-            if (dataReader.HasRows)
+            //Open connection
+            if (this.OpenConnection() == true)
             {
-                result = new Product(dataReader["ProductID"] + "", dataReader["Barcode"] + "", dataReader["Name"] + "", double.Parse(dataReader["Price"] + ""), int.Parse(dataReader["Points"] + ""), int.Parse(dataReader["StoreQty"] + ""));
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                //prepare the statement to avoid SQL injection
+                cmd.Prepare();
+                // put parameter
+                cmd.Parameters.AddWithValue("@text", barcode);
+                //Create a data reader and Execute the command
+                MySqlDataReader dataReader = cmd.ExecuteReader();
+
+                //Read the data and store them in the list
+                dataReader.Read();
+                Product result = null;
+                if (dataReader.HasRows)
+                {
+                    result = new Product(dataReader["ProductID"] + "", dataReader["Barcode"] + "", dataReader["Name"] + "", double.Parse(dataReader["Price"] + ""), int.Parse(dataReader["Points"] + ""), int.Parse(dataReader["StoreQty"].ToString()), int.Parse(dataReader["WarehouseQty"].ToString()));
+                }
+
+                //close Data Reader
+                dataReader.Close();
+
+                //return list to be displayed
+                return result;
             }
-
-            //close Data Reader
-            dataReader.Close();
-
-            //return list to be displayed
-            return result;
+            else
+            {
+                return null;
+            }
         }
-        else
-        {
-            return null;
-        }
-        } finally
+        finally
         {
             //close Connection
             this.CloseConnection();
@@ -210,6 +216,49 @@ class DataManager
         else
         {
             return null;
+        }
+    }
+
+    public bool insertProduct(Product product)
+    {
+        string query = "INSERT INTO product (ProductId, Barcode, Name, Price, StoreQty, WarehouseQty, Points) VALUES(@productId, @barcode, @name, @price, @storeQty, @warehouseQty, @points)";
+        try
+        {
+            //open connection
+            if (this.OpenConnection() == true)
+            {
+
+
+                //create command and assign the query and connection from the constructor
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                // prepare statement to avoid SQL injection
+                cmd.Prepare();
+
+                // set common values for all the items
+                cmd.Parameters.AddWithValue("@productId", product.ID);
+                cmd.Parameters.AddWithValue("@barcode", product.Barcode);
+                cmd.Parameters.AddWithValue("@name", product.Product_name);
+                cmd.Parameters.AddWithValue("@price", product.Price);
+                cmd.Parameters.AddWithValue("@storeQty", product.StoreQty);
+                cmd.Parameters.AddWithValue("@warehouseQty", product.WarehouseQty);
+                cmd.Parameters.AddWithValue("@points", product.Points);
+
+                //Execute command
+                cmd.ExecuteNonQuery();
+
+                
+                
+            }
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            //close connection
+            this.CloseConnection();
         }
     }
 }

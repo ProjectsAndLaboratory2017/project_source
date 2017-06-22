@@ -82,15 +82,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AddProduct.xaml.cs">
+      <DependentUpon>AddProduct.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DBConnect.cs" />
     <Compile Include="Model\Customer.cs" />
     <Compile Include="Model\Product.cs" />
     <Compile Include="Model\Receipt.cs" />
+    <Compile Include="OnlineProductManager.cs" />
+    <Compile Include="ProductFinder.cs" />
     <Compile Include="UDPNetwork\Client.cs" />
     <Compile Include="UDPNetwork\Peer.cs" />
     <Compile Include="UDPNetwork\Server.cs" />
     <Compile Include="UDPNetwork\TokenAndData.cs" />
     <Compile Include="UDPNetwork\Utils.cs" />
+    <Page Include="AddProduct.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

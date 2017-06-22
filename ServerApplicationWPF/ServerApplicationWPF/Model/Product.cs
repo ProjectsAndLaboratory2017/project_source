@@ -11,13 +11,14 @@ namespace ServerApplicationWPF.Model
     {
         public string ID { get; private set; }
         public string Barcode { get; private set; }
-        public string Product_name { get; private set; }
-        public double Price { get; private set; }
-        public int Points { get; private set; }
-        public int StoreQty { get; private set; }
+        public string Product_name { get; set; }
+        public double Price { get; set; }
+        public int Points { get; set; }
+        public int StoreQty { get; set; }
+        public int WarehouseQty { get; set; }
         public String Type { get; private set; }
 
-        public Product(string id, string barcode, string name, double price, int points, int storeQty)
+        public Product(string id, string barcode, string name, double price, int points, int storeQty, int warehouseQty)
         {
             ID = id;
             Barcode = barcode;
@@ -25,6 +26,7 @@ namespace ServerApplicationWPF.Model
             Price = price;
             Points = points;
             StoreQty = storeQty;
+            this.WarehouseQty = warehouseQty;
             Type = "product";
         }
 

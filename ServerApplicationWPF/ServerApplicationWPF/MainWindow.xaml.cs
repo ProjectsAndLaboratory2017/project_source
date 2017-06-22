@@ -21,6 +21,8 @@ using ZXing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerApplicationWPF.UDPNetwork;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace ServerApplicationWPF
 {
@@ -35,13 +37,16 @@ namespace ServerApplicationWPF
 
         private delegate void StringConsumer(string s);
         private delegate void ImageConsumer(Bitmap image);
+        private bool allowRemoteProduct = false;
+        private BlockingCollection<string> barcodesToBeSearchedOnline = new BlockingCollection<string>();
+        private OnlineProductManager onlineProductManager;
         public MainWindow()
         {
             InitializeComponent();
             codeScanner = new CodeScanner();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
             dbConnect = new DataManager();
-            Console.WriteLine("ciao");
+            onlineProductManager = new OnlineProductManager(dbConnect, barcodesToBeSearchedOnline);
         }
 
         private void messageProcessing(string message)
@@ -103,6 +108,10 @@ namespace ServerApplicationWPF
                         Product p = dbConnect.getProductByBarcode(textResult);
                         if (p == null)
                         {
+                            if (allowRemoteProduct)
+                            {
+                                barcodesToBeSearchedOnline.Add(textResult);
+                            }
                             messageProcessing("No products found");
                             response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Utils.StringToBytes("Error"));
                         }
@@ -194,8 +203,7 @@ namespace ServerApplicationWPF
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            Product product = dbConnect.getProductByBarcode(barcode_txt.Text);
-            db_output.Text = product.Product_name;
+            barcodesToBeSearchedOnline.Add(barcode_txt.Text);
         }
 
         private Bitmap rotateImage90(Bitmap b)
@@ -263,6 +271,16 @@ namespace ServerApplicationWPF
             g.Dispose();
 
             return newImg;
+        }
+
+        private void checkbox_unchecked(object sender, RoutedEventArgs e)
+        {
+            this.allowRemoteProduct = false;
+        }
+
+        private void checkbox_checked(object sender, RoutedEventArgs e)
+        {
+            this.allowRemoteProduct = true;
         }
     }
 }
