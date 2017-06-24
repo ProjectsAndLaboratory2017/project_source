@@ -110,8 +110,14 @@ namespace BoardApplication
             flagButtonPressHere = true;
         }
 
-        void addText(int dim1, int dim2, string text){
-        
+        Text addText(int dim1, int dim2, string text){
+           
+            Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
+            txtMessage = new Text(baseFont, text);
+            Canvas.SetTop(txtMessage, dim1);
+            Canvas.SetLeft(txtMessage, dim2);
+           
+            return txtMessage;
         }
 
         //FIRST WINDOW
@@ -131,25 +137,17 @@ namespace BoardApplication
 
             l.Clear();
             Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
-            
-            
-            txtMessage = new Text(baseFont, "Welcome to the automatic cash.");
+
+            txtMessage = addText(30, 45, "Welcome to the automatic cash.");
             canvas.Children.Add(txtMessage);
 
-            //addText(30, 45, "Select your products pressing the");
-            Canvas.SetTop(txtMessage, 30);
-            Canvas.SetLeft(txtMessage, 45);
-            txtMessage = new Text(baseFont, "Select your products pressing the");
+            txtMessage = addText(50, 40, "Start your shopping pressing the");
             canvas.Children.Add(txtMessage);
 
-            Canvas.SetTop(txtMessage, 50);
-            Canvas.SetLeft(txtMessage, 40);
-            txtMessage = new Text(baseFont, "button 'Press Here'!");
+            txtMessage = addText(70, 130, "button!");
             canvas.Children.Add(txtMessage);
+
             
-            Canvas.SetTop(txtMessage, 70);
-            Canvas.SetLeft(txtMessage, 90);
-
             normalButtonByte = Resources.GetBytes(Resources.BinaryResources.NormalButton);
             pressedButtonByte = Resources.GetBytes(Resources.BinaryResources.PressedButton);
             normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
@@ -174,35 +172,26 @@ namespace BoardApplication
                 
             if (globalAuth == false)
             {
-                txtMessage = new Text(baseFont, "SCAN YOUR QR CODE ");
-                Canvas.SetTop(txtMessage, 70);
-                Canvas.SetLeft(txtMessage, 75);
-                
+                txtMessage = addText(70, 75, "SCAN YOUR QR CODE ");
                 canvas.Children.Add(txtMessage);
-                txtMessage = new Text(baseFont, "IN FRONT OF ");
-                Canvas.SetTop(txtMessage, 100);
-                Canvas.SetLeft(txtMessage, 108);
+
+                txtMessage = addText(100, 108, "IN FRONT OF ");
                 canvas.Children.Add(txtMessage);
-                txtMessage = new Text(baseFont, "THE CAMERA");
-                Canvas.SetTop(txtMessage, 130);
-                Canvas.SetLeft(txtMessage, 110);
+
+                txtMessage = addText(130, 110, "THE CAMERA");
                 canvas.Children.Add(txtMessage);
             }
             else
             {
                 tunes.Play(new Tunes.MusicNote(Tunes.Tone.D3, 200));
 
-                txtMessage = new Text(baseFont, "The authentication is failed.");
-                Canvas.SetTop(txtMessage, 30);
-                Canvas.SetLeft(txtMessage, 50);
+                txtMessage = addText(30, 50, "The authentication is failed.");
                 canvas.Children.Add(txtMessage);
-                txtMessage = new Text(baseFont, "Please scan again your QR code ");
-                Canvas.SetTop(txtMessage, 75);
-                Canvas.SetLeft(txtMessage, 50);
+
+                txtMessage = addText(75, 50, "Please scan again your QR code ");
                 canvas.Children.Add(txtMessage);
-                txtMessage = new Text(baseFont, "in front of the camera.");
-                Canvas.SetTop(txtMessage, 95);
-                Canvas.SetLeft(txtMessage, 75);
+
+                txtMessage = addText(95, 75, "in front of the camera.");
                 canvas.Children.Add(txtMessage);
             }
                  
@@ -238,9 +227,8 @@ namespace BoardApplication
             Canvas canvas = new Canvas();
             window.Child = canvas;
             Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
-            txtMessage = new Text(baseFont, "List of goods:");
-            Canvas.SetTop(txtMessage, 10);
-            Canvas.SetLeft(txtMessage, 30);
+
+            txtMessage = addText(10, 30, "List of goods:");
             canvas.Children.Add(txtMessage);
 
             deleteButton = new Image();
@@ -264,8 +252,6 @@ namespace BoardApplication
                 //bitmapNormalButton.SetPixel(25, 27, GT.Color.Blue);
                 deleteButton = new Image(bitmapNormalButton);
 
-
-
                 deleteButton.TouchDown += new TouchEventHandler(imgButton_TouchDownDelete);
                 deleteButton.TouchUp += new TouchEventHandler(imgButton_TouchUpDelete);
                 if (deleteProducts.Contains(d.Key))
@@ -282,29 +268,25 @@ namespace BoardApplication
                 totalPrice += (p.price*p.Qty);
                 totalPoints += (p.points*p.Qty);
                 
+
                 Canvas.SetTop(deleteButton, top);
                 Canvas.SetLeft(deleteButton, 280);
                 canvas.Children.Add(deleteButton);
                 i++;
-                txtMessage = new Text(baseFont,s);
 
-                Canvas.SetTop(txtMessage, top);
-                Canvas.SetLeft(txtMessage, left);
+                txtMessage = addText(top, left, s);
                 canvas.Children.Add(txtMessage);
                 top += 25;
             }
             String stringPrice = "Total price: " + totalPrice.ToString("n2")+"$";
-            txtMessage = new Text(baseFont, stringPrice);
-            Canvas.SetTop(txtMessage, 170);
-            Canvas.SetLeft(txtMessage, 180);
+
+            txtMessage = addText(170, 180, stringPrice);
             canvas.Children.Add(txtMessage);
 
             String stringPoints = "Total points: " + totalPoints;
-            txtMessage = new Text(baseFont, stringPoints);
-            Canvas.SetTop(txtMessage, 195);
-            Canvas.SetLeft(txtMessage, 180);
+            txtMessage = addText(195, 180, stringPoints);
             canvas.Children.Add(txtMessage);
-            
+
             if (barcodeError == true)
             {
                 Tunes.MusicNote[] notes = new Tunes.MusicNote[1];
@@ -312,10 +294,9 @@ namespace BoardApplication
                 
                 tunes.Play(notes);
 
-                txtMessage = new Text(baseFont, stringError);
-                Canvas.SetTop(txtMessage, top);
-                Canvas.SetLeft(txtMessage, left);
+                txtMessage = addText(top, left, stringError);
                 canvas.Children.Add(txtMessage);
+
                 top += 15;
             }
             
@@ -457,12 +438,10 @@ namespace BoardApplication
             Canvas canvas = new Canvas();
             window.Child = canvas;
             Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
-            txtMessage = new Text(baseFont, "THANKS FOR YOUR PURCHASE!");
-            Canvas.SetTop(txtMessage, 100);
-            Canvas.SetLeft(txtMessage, 50);
+
+            txtMessage = addText(100, 50, "THANKS FOR YOUR PURCHASE!");
             canvas.Children.Add(txtMessage);
 
-            
             timer.Tick += timer_Tick; // Run the method timer_tick when the timer ticks
             timer.Start(); // Start the timer
         }
@@ -515,11 +494,9 @@ namespace BoardApplication
             
             Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
 
-            txtMessage = new Text(baseFont, "Welcome " + user.name);
+            txtMessage = addText(80, 100, "Welcome " + user.name);
             canvas.Children.Add(txtMessage);
-            Canvas.SetTop(txtMessage, 80);
-            Canvas.SetLeft(txtMessage, 100);
-
+            
             normalButtonByte = Resources.GetBytes(Resources.BinaryResources.startBuying);
             pressedButtonByte = Resources.GetBytes(Resources.BinaryResources.PressedStartBuying);
             normalButton = new Bitmap(normalButtonByte, Bitmap.BitmapImageType.Jpeg);
@@ -540,10 +517,10 @@ namespace BoardApplication
             window.Child = canvas;
             window.Background = new SolidColorBrush(GT.Color.Red);
             Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
-            txtMessage = new Text(baseFont, "THE CONNECTION IS DOWN!");
-            Canvas.SetTop(txtMessage, 100);
-            Canvas.SetLeft(txtMessage, 50);
+            
+            txtMessage = addText(100, 50, "THE CONNECTION IS DOWN!");
             canvas.Children.Add(txtMessage);
+
             return null;
         }
 
