@@ -21,6 +21,8 @@ using ZXing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServerApplicationWPF.UDPNetwork;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace ServerApplicationWPF
 {
@@ -30,18 +32,40 @@ namespace ServerApplicationWPF
     public partial class MainWindow : Window
     {
         private NetworkDriver networkDriver;
-        private CodeScanner codeScanner;
+        private IBarcodeReader reader;
         private DataManager dbConnect;
 
         private delegate void StringConsumer(string s);
         private delegate void ImageConsumer(Bitmap image);
+        private bool allowRemoteProduct = false;
+        private BlockingCollection<string> barcodesToBeSearchedOnline = new BlockingCollection<string>();
+        private OnlineProductManager onlineProductManager;
         public MainWindow()
         {
+            dbConnect = null;
+            do
+            {
+                try
+                {
+                    dbConnect = new DataManager();
+                    break;
+                }
+                catch (Exception e)
+                {
+                    var messageBoxResult = MessageBox.Show(e.Message + "\nDo you want to retry to connect?", "Error starting the application", MessageBoxButton.YesNo);
+                    if (messageBoxResult != MessageBoxResult.Yes)
+                    {
+                        Application.Current.Shutdown();
+                        return;
+                    }
+                }
+            } while (dbConnect == null);
+
+
             InitializeComponent();
-            codeScanner = new CodeScanner();
+            reader = new BarcodeReader();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
-            dbConnect = new DataManager();
-            Console.WriteLine("ciao");
+            onlineProductManager = new OnlineProductManager(dbConnect, barcodesToBeSearchedOnline);
         }
 
         private void messageProcessing(string message)
@@ -61,7 +85,7 @@ namespace ServerApplicationWPF
                 // do the barcode scan
                 ArrayList barcodes = new ArrayList();
                 //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
-                IBarcodeReader reader = new BarcodeReader();
+
                 var result = reader.Decode(image);
 
                 //string result = codeScanner.ScanPage(image);
@@ -103,6 +127,10 @@ namespace ServerApplicationWPF
                         Product p = dbConnect.getProductByBarcode(textResult);
                         if (p == null)
                         {
+                            if (allowRemoteProduct)
+                            {
+                                barcodesToBeSearchedOnline.Add(textResult);
+                            }
                             messageProcessing("No products found");
                             response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Utils.StringToBytes("Error"));
                         }
@@ -194,8 +222,7 @@ namespace ServerApplicationWPF
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            Product product = dbConnect.getProductByBarcode(barcode_txt.Text);
-            db_output.Text = product.Product_name;
+            barcodesToBeSearchedOnline.Add(barcode_txt.Text);
         }
 
         private Bitmap rotateImage90(Bitmap b)
@@ -263,6 +290,16 @@ namespace ServerApplicationWPF
             g.Dispose();
 
             return newImg;
+        }
+
+        private void checkbox_unchecked(object sender, RoutedEventArgs e)
+        {
+            this.allowRemoteProduct = false;
+        }
+
+        private void checkbox_checked(object sender, RoutedEventArgs e)
+        {
+            this.allowRemoteProduct = true;
         }
     }
 }

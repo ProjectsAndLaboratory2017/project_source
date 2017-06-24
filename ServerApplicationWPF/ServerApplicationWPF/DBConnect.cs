@@ -2,7 +2,7 @@
 using ServerApplicationWPF.Model;
 using System.Collections.Generic;
 
-class DataManager
+public class DataManager
 {
     private MySqlConnection connection;
     private string server;
@@ -13,12 +13,6 @@ class DataManager
     //Constructor
     public DataManager()
     {
-        Initialize();
-    }
-
-    //Initialize values
-    private void Initialize()
-    {
         server = "localhost";
         database = "plcs";
         uid = "plcs";
@@ -28,16 +22,26 @@ class DataManager
         database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
 
         connection = new MySqlConnection(connectionString);
+
+        OpenConnection();
+    }
+
+    ~DataManager()
+    {
+        connection.Close();
     }
 
     // TODO use transactions
+    private MySqlTransaction getTransaction()
+    {
+        return connection.BeginTransaction();
+    }
     //open connection to database
-    private bool OpenConnection()
+    private void OpenConnection()
     {
         try
         {
             connection.Open();
-            return true;
         }
         catch (MySqlException ex)
         {
@@ -60,16 +64,28 @@ class DataManager
     }
 
     //Close connection
-    private bool CloseConnection()
+    private void CloseConnection()
     {
         try
         {
+            if (connection.State == System.Data.ConnectionState.Closed)
+            {
+                return;
+            }
             connection.Close();
-            return true;
         }
         catch (MySqlException ex)
         {
             throw new System.Exception("Exception closing connection to database: " + ex.Message);
+        }
+    }
+
+    void checkOpenConnection()
+    {
+        if (connection.State != System.Data.ConnectionState.Open)
+        {
+            CloseConnection();
+            OpenConnection();
         }
     }
 
@@ -78,9 +94,9 @@ class DataManager
     {
         string query = "INSERT INTO receipt (ReceiptId, ProductId, CustomerId, Date, Quantity) VALUES(@receipt, @product, @customer, @date, @quantity)";
         string getMaxIdQuery = "SELECT max(ReceiptId) FROM receipt";
-
         //open connection
-        if (this.OpenConnection() == true)
+        checkOpenConnection();
+        using (var transaction = connection.BeginTransaction())
         {
 
             /**
@@ -91,7 +107,7 @@ class DataManager
              * 
              */
             // get the max receipt id
-            MySqlCommand getMaxReceiptIdCmd = new MySqlCommand(getMaxIdQuery, connection);
+            MySqlCommand getMaxReceiptIdCmd = new MySqlCommand(getMaxIdQuery, connection, transaction);
             MySqlDataReader dataReader = getMaxReceiptIdCmd.ExecuteReader();
             dataReader.Read();
             int receiptId = 0;
@@ -102,7 +118,7 @@ class DataManager
             dataReader.Close();
             receiptId++;
             //create command and assign the query and connection from the constructor
-            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlCommand cmd = new MySqlCommand(query, connection, transaction);
             // prepare statement to avoid SQL injection
             cmd.Prepare();
 
@@ -124,9 +140,7 @@ class DataManager
                 cmd.ExecuteNonQuery();
             }
 
-            //close connection
-            // TODO this should be in finally block
-            this.CloseConnection();
+            transaction.Commit();
         }
     }
 
@@ -135,13 +149,12 @@ class DataManager
     {
         string query = "SELECT * FROM product where barcode=@text";
 
-        try { 
-
         //Open connection
-        if (this.OpenConnection() == true)
+        checkOpenConnection();
+        using (var transaction = connection.BeginTransaction())
         {
             //Create Command
-            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlCommand cmd = new MySqlCommand(query, connection, transaction);
             //prepare the statement to avoid SQL injection
             cmd.Prepare();
             // put parameter
@@ -154,23 +167,16 @@ class DataManager
             Product result = null;
             if (dataReader.HasRows)
             {
-                result = new Product(dataReader["ProductID"] + "", dataReader["Barcode"] + "", dataReader["Name"] + "", double.Parse(dataReader["Price"] + ""), int.Parse(dataReader["Points"] + ""), int.Parse(dataReader["StoreQty"] + ""));
+                result = new Product(dataReader["ProductID"] + "", dataReader["Barcode"] + "", dataReader["Name"] + "", double.Parse(dataReader["Price"] + ""), int.Parse(dataReader["Points"] + ""), int.Parse(dataReader["StoreQty"].ToString()), int.Parse(dataReader["WarehouseQty"].ToString()));
             }
 
             //close Data Reader
             dataReader.Close();
 
+            transaction.Commit();
+
             //return list to be displayed
             return result;
-        }
-        else
-        {
-            return null;
-        }
-        } finally
-        {
-            //close Connection
-            this.CloseConnection();
         }
     }
 
@@ -179,10 +185,11 @@ class DataManager
         string query = "SELECT * FROM customer where barcode=@text";
 
         //Open connection
-        if (this.OpenConnection() == true)
+        checkOpenConnection();
+        using (var transaction = connection.BeginTransaction())
         {
             //Create Command
-            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlCommand cmd = new MySqlCommand(query, connection, transaction);
             //prepare the statement to avoid SQL injection
             cmd.Prepare();
             // put parameter
@@ -202,14 +209,42 @@ class DataManager
             dataReader.Close();
 
             //close Connection
-            this.CloseConnection();
+            transaction.Commit();
 
             //return list to be displayed
             return result;
         }
-        else
+    }
+
+    public void insertProduct(Product product)
+    {
+        string query = "INSERT INTO product (ProductId, Barcode, Name, Price, StoreQty, WarehouseQty, Points) VALUES(@productId, @barcode, @name, @price, @storeQty, @warehouseQty, @points)";
+
+        //open connection
+        checkOpenConnection();
+        using (var transaction = connection.BeginTransaction())
         {
-            return null;
+
+
+            //create command and assign the query and connection from the constructor
+            MySqlCommand cmd = new MySqlCommand(query, connection, transaction);
+            // prepare statement to avoid SQL injection
+            cmd.Prepare();
+
+            // set common values for all the items
+            cmd.Parameters.AddWithValue("@productId", product.ID);
+            cmd.Parameters.AddWithValue("@barcode", product.Barcode);
+            cmd.Parameters.AddWithValue("@name", product.Product_name);
+            cmd.Parameters.AddWithValue("@price", product.Price);
+            cmd.Parameters.AddWithValue("@storeQty", product.StoreQty);
+            cmd.Parameters.AddWithValue("@warehouseQty", product.WarehouseQty);
+            cmd.Parameters.AddWithValue("@points", product.Points);
+
+            //Execute command
+            cmd.ExecuteNonQuery();
+
+            transaction.Commit();
+
         }
     }
 }
