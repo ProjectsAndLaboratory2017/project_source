@@ -110,6 +110,10 @@ namespace BoardApplication
             flagButtonPressHere = true;
         }
 
+        void addText(int dim1, int dim2, string text){
+        
+        }
+
         //FIRST WINDOW
         void createWindowOne()
         {
@@ -130,17 +134,19 @@ namespace BoardApplication
             
             
             txtMessage = new Text(baseFont, "Welcome to the automatic cash.");
-
             canvas.Children.Add(txtMessage);
+
+            //addText(30, 45, "Select your products pressing the");
             Canvas.SetTop(txtMessage, 30);
             Canvas.SetLeft(txtMessage, 45);
             txtMessage = new Text(baseFont, "Select your products pressing the");
-            
             canvas.Children.Add(txtMessage);
+
             Canvas.SetTop(txtMessage, 50);
             Canvas.SetLeft(txtMessage, 40);
             txtMessage = new Text(baseFont, "button 'Press Here'!");
             canvas.Children.Add(txtMessage);
+            
             Canvas.SetTop(txtMessage, 70);
             Canvas.SetLeft(txtMessage, 90);
 
@@ -244,6 +250,7 @@ namespace BoardApplication
             int top = 30;
             int left = 30;
             int i=0;
+            double totalPrice = 0, totalPoints = 0;
             foreach (DictionaryEntry d in l)
             {
 
@@ -267,9 +274,14 @@ namespace BoardApplication
                 deleteProducts.Add(d.Key, deleteButton);
                 
                 ProductInfo p = d.Value as ProductInfo;
-                String s = p.productName + " " + p.price.ToString("f") + "$" + "    " + p.Qty;
-
-
+                if (p.productName.Length >= 20) {
+                    p.productName = p.productName.Substring(0, 20);
+                    p.productName += "...";
+                }
+                String s = p.productName + " " + p.price.ToString("f") + "$" + "  " + p.Qty;
+                totalPrice += (p.price*p.Qty);
+                totalPoints += (p.points*p.Qty);
+                
                 Canvas.SetTop(deleteButton, top);
                 Canvas.SetLeft(deleteButton, 280);
                 canvas.Children.Add(deleteButton);
@@ -281,7 +293,18 @@ namespace BoardApplication
                 canvas.Children.Add(txtMessage);
                 top += 25;
             }
+            String stringPrice = "Total price: " + totalPrice.ToString("n2")+"$";
+            txtMessage = new Text(baseFont, stringPrice);
+            Canvas.SetTop(txtMessage, 170);
+            Canvas.SetLeft(txtMessage, 180);
+            canvas.Children.Add(txtMessage);
 
+            String stringPoints = "Total points: " + totalPoints;
+            txtMessage = new Text(baseFont, stringPoints);
+            Canvas.SetTop(txtMessage, 195);
+            Canvas.SetLeft(txtMessage, 180);
+            canvas.Children.Add(txtMessage);
+            
             if (barcodeError == true)
             {
                 Tunes.MusicNote[] notes = new Tunes.MusicNote[1];
@@ -304,7 +327,7 @@ namespace BoardApplication
             //normalButton.SetPixel(154, 55, GT.Color.Blue);
             imgButton = new Image(normalButton);
             Canvas.SetTop(imgButton, 170);
-            Canvas.SetLeft(imgButton, 80);
+            Canvas.SetLeft(imgButton, 5);
             canvas.Children.Add(imgButton);
 
             imgButton.TouchDown += new TouchEventHandler(imgButton_TouchDown3);
@@ -519,7 +542,7 @@ namespace BoardApplication
             Font baseFont = Resources.GetFont(Resources.FontResources.Calibri);
             txtMessage = new Text(baseFont, "THE CONNECTION IS DOWN!");
             Canvas.SetTop(txtMessage, 100);
-            Canvas.SetLeft(txtMessage, 70);
+            Canvas.SetLeft(txtMessage, 50);
             canvas.Children.Add(txtMessage);
             return null;
         }
