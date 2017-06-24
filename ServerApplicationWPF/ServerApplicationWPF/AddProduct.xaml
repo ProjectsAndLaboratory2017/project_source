@@ -5,22 +5,57 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerApplicationWPF"
         mc:Ignorable="d"
-        Title="AddProduct" Height="300" Width="300">
-    <Grid>
-        <Label x:Name="NameLabel" Content="Product name:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="NameValue" HorizontalAlignment="Left" Height="23" Margin="10,62,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" />
-        <Label x:Name="PriceLabel" Content="Price:" HorizontalAlignment="Left" Margin="135,36,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="PriceValue" HorizontalAlignment="Left" Height="23" Margin="135,62,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" PreviewTextInput="PriceNumberValidationTextBox"/>
-        <Label x:Name="BarcodeLabel" Content="Barcode:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="BarcodeValue" Content="" HorizontalAlignment="Left" Margin="74,10,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="PointsLabel" Content="Points:" HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="PointsValue" HorizontalAlignment="Left" Height="23" Margin="10,111,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" PreviewTextInput="IntNumberValidationTextBox" />
-        <Label x:Name="StoreQtyLabel" Content="Store quantity:" HorizontalAlignment="Left" Margin="135,85,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="StoreQtyValue" HorizontalAlignment="Left" Height="23" Margin="135,111,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" PreviewTextInput="IntNumberValidationTextBox" />
-        <Label x:Name="WarehouseQtyLabel" Content="Warehouse quantity:" HorizontalAlignment="Left" Margin="10,134,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="WarehouseQtyValue" HorizontalAlignment="Left" Height="23" Margin="10,160,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" PreviewTextInput="IntNumberValidationTextBox" />
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="127,239,0,0" VerticalAlignment="Top" Width="75" Click="CancelButton_Click"/>
-        <Button x:Name="ConfirmButton" Content="Confirm" HorizontalAlignment="Left" Margin="207,239,0,0" VerticalAlignment="Top" Width="75" Click="ConfirmButton_Click"/>
+        Title="AddProduct" Height="209" Width="727" ResizeMode="NoResize">
+    <Grid Background="WhiteSmoke">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition />
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" x:Name="BarcodeLabel" Content="Barcode:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Grid.Row="0" x:Name="BarcodeValue" Content="barcode placeholder" HorizontalAlignment="Left" Margin="74,10,0,0" VerticalAlignment="Top"/>
+
+        <Button Grid.Row="2" x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Width="90" Click="CancelButton_Click" Margin="0,0,100,0" Background="LightGray" Height="50"/>
+        <Button Grid.Row="2" x:Name="ConfirmButton" Content="Confirm" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="90" Click="ConfirmButton_Click" Background="White" Height="50" />
+        <UniformGrid Grid.Row="1" Columns="2">
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0" x:Name="NameLabel" Content="Product name:" />
+                <TextBox Grid.Column="1" Grid.Row="0" x:Name="NameValue" TextWrapping="Wrap" Text="TextBox" />
+                <Label Grid.Column="0" Grid.Row="1" x:Name="PointsLabel" Content="Points:" HorizontalAlignment="Left"/>
+                <TextBox Grid.Column="1" Grid.Row="1" x:Name="PointsValue" TextWrapping="Wrap" Text="TextBox" PreviewTextInput="IntNumberValidationTextBox" />
+                <Label Grid.Column="0" Grid.Row="2" x:Name="WarehouseQtyLabel" Content="Warehouse quantity:"/>
+                <TextBox Grid.Column="1" Grid.Row="2" x:Name="WarehouseQtyValue" TextWrapping="Wrap" Text="TextBox" PreviewTextInput="IntNumberValidationTextBox" />
+            </Grid>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0" x:Name="PriceLabel" Content="Price:" />
+                <TextBox Grid.Column="1" Grid.Row="0" x:Name="PriceValue" TextWrapping="Wrap" Text="TextBox" PreviewTextInput="PriceNumberValidationTextBox"/>
+                <Label Grid.Column="0" Grid.Row="1" x:Name="StoreQtyLabel" Content="Store quantity:"/>
+                <TextBox Grid.Column="1" Grid.Row="1" x:Name="StoreQtyValue" TextWrapping="Wrap" Text="TextBox" PreviewTextInput="IntNumberValidationTextBox" />
+            </Grid>
+
+        </UniformGrid>
 
     </Grid>
 </Window>

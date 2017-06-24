@@ -26,11 +26,12 @@ namespace ServerApplicationWPF
         public AddProduct(Product product, DataManager dataManager)
         {
             InitializeComponent();
+            Style = (Style)FindResource(typeof(Window));
             this.product = product;
             this.dataManager = dataManager;
             BarcodeValue.Content = product.Barcode;
             NameValue.Text = product.Product_name;
-            PriceValue.Text = product.Price.ToString("N2");
+            PriceValue.Text = product.Price;
             PointsValue.Text = product.Points.ToString();
             StoreQtyValue.Text = product.StoreQty.ToString();
             WarehouseQtyValue.Text = product.WarehouseQty.ToString();
@@ -56,12 +57,13 @@ namespace ServerApplicationWPF
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             product.Product_name = NameValue.Text;
-            product.Price = double.Parse(PriceValue.Text);
-            product.Points = int.Parse(PointsValue.Text);
+            product.Price = PriceValue.Text;
+            product.Points = PointsValue.Text;
+            double price = double.Parse(product.Price);
             product.StoreQty = int.Parse(StoreQtyValue.Text);
             product.WarehouseQty = int.Parse(WarehouseQtyValue.Text);
 
-            if (product.Price <= 0)
+            if (price <= 0)
             {
                 MessageBox.Show("Price must be greater than 0");
             }

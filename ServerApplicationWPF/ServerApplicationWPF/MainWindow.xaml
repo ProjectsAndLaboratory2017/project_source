@@ -6,14 +6,12 @@
         xmlns:local="clr-namespace:ServerApplicationWPF"
         mc:Ignorable="d"
         Title="Server Application" Height="400" Width="720" Closed="Window_Closed" Icon="Resources/shop-cash-register-icon-87069.png" MinHeight="300" MinWidth="500">
-    <Grid Background="#FF2BA842">
+    <Grid Background="WhiteSmoke">
         <ScrollViewer Name="MyScrollViewer" Margin="0,250,0,0">
-            <TextBlock x:Name="Log" TextWrapping="Wrap" Background="#FFAEAEAE"/>
+            <TextBlock x:Name="Log" TextWrapping="Wrap" Background="LightGray" FontFamily="Consolas"/>
         </ScrollViewer>
         <Image x:Name="ImageDisplay" HorizontalAlignment="Left" VerticalAlignment="Top" Width="320" Height="198" />
-        <TextBox x:Name="barcode_txt" HorizontalAlignment="Right" Height="24" Margin="0,9,92,0" TextWrapping="Wrap" Text="Search barcode" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
-        <TextBlock x:Name="db_output" HorizontalAlignment="Right" Margin="0,38,92,0" TextWrapping="Wrap" Text="Product name" VerticalAlignment="Top" Background="#FFBFBFBF" Height="21" Width="119"/>
-        <CheckBox x:Name="AllowRemoteProduct" Content="Allow remote product search" HorizontalAlignment="Left" Margin="242,9,0,0" VerticalAlignment="Top" Checked="checkbox_checked" Unchecked="checkbox_unchecked"/>
+        <CheckBox x:Name="AllowRemoteProduct" Content="Enable adding new products" HorizontalAlignment="Center" Margin="0,9,0,0" VerticalAlignment="Top" Checked="checkbox_checked" Unchecked="checkbox_unchecked" HorizontalContentAlignment="Center"/>
+        <Label x:Name="label" Content="LOG:" HorizontalAlignment="Left" Margin="0,224,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

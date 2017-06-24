@@ -12,8 +12,8 @@ namespace ServerApplicationWPF.Model
         public string ID { get; private set; }
         public string Barcode { get; private set; }
         public string Product_name { get; set; }
-        public double Price { get; set; }
-        public int Points { get; set; }
+        public string Price { get; set; }
+        public string Points { get; set; }
         public int StoreQty { get; set; }
         public int WarehouseQty { get; set; }
         public String Type { get; private set; }
@@ -23,8 +23,8 @@ namespace ServerApplicationWPF.Model
             ID = id;
             Barcode = barcode;
             Product_name = name;
-            Price = price;
-            Points = points;
+            Price = price.ToString("N2");
+            Points = points.ToString();
             StoreQty = storeQty;
             this.WarehouseQty = warehouseQty;
             Type = "product";
@@ -32,9 +32,8 @@ namespace ServerApplicationWPF.Model
 
         public override string ToString()
         {
-            //return JsonConvert.SerializeObject(this);
-            // TODO remove this crap, use properly json
-            return "{\"Type\":\"product\",\"ID\":\"" + ID + "\",\"Product_name\":\"" + Product_name + "\",\"Price\":\"" + Price + "\",\"Points\":\"" + Points + "\"}";
+            return JsonConvert.SerializeObject(this);
+            //return "{\"Type\":\"product\",\"ID\":\"" + ID + "\",\"Product_name\":\"" + Product_name + "\",\"Price\":\"" + Price + "\",\"Points\":\"" + Points + "\"}";
         }
     }
 }

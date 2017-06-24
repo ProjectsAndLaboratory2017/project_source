@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:ServerApplicationWPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="FontFamily" Value="Segoe UI semilight" />
+        </Style>
     </Application.Resources>
 </Application>

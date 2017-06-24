@@ -63,6 +63,7 @@ namespace ServerApplicationWPF
 
 
             InitializeComponent();
+            Style = (Style)FindResource(typeof(Window));
             reader = new BarcodeReader();
             networkDriver = new NetworkDriver(requestProcessing, messageProcessing);
             onlineProductManager = new OnlineProductManager(dbConnect, barcodesToBeSearchedOnline);
@@ -82,23 +83,17 @@ namespace ServerApplicationWPF
                 Bitmap image2 = new Bitmap(image);
                 // show the image
                 this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new ImageConsumer(displayImage), image2);
-                // do the barcode scan
-                ArrayList barcodes = new ArrayList();
-                //BarcodeScanner.FullScanPage(ref barcodes, image, 100);
-
-                var result = reader.Decode(image);
-
-                //string result = codeScanner.ScanPage(image);
-                int rotation = 0;
-                while (result == null && rotation < 36)
+                int rotations = 0;
+                Result result = null;
+                // attempt recognition of codes multiple times rotating the images
+                do
                 {
-                    //image = rotateImage90(image);
-                    var image_tmp = RotateImg(image, rotation * 10, System.Drawing.Color.Transparent);
+                    var image_tmp = RotateImg(image, rotations * 10, System.Drawing.Color.Transparent);
                     result = reader.Decode(image_tmp);
-                    rotation++;
-                    this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new ImageConsumer(displayImage), image_tmp);
+                    rotations++;
                 }
-                //messageProcessing("Scan done. Found " + barcodes.Count + "barcodes");
+                while (result == null && rotations < 36);
+                
                 NetworkResponse response;
                 if (result != null)
                 {
@@ -148,8 +143,7 @@ namespace ServerApplicationWPF
                 }
                 else
                 {
-                    messageProcessing("No barcodes found");
-                    //response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingResult, Encoding.UTF8.GetBytes("{\"ID\":\"10\",\"Name\":\"Martino\",\"Surname\":\"Mensio\",\"Email\":\"martino@gmail.com\"}"));
+                    messageProcessing("No codes found");
                     response = new NetworkResponse(NetworkResponse.ResponseType.ImageProcessingError, Utils.StringToBytes("Error"));
                 }
                 return response;
@@ -158,10 +152,11 @@ namespace ServerApplicationWPF
             {
                 try
                 {
-                    string req = UDPNetwork.Utils.BytesToString(request.Payload);
+                    string req = Utils.BytesToString(request.Payload);
                     JObject receipt = JObject.Parse(req);
                     // get customerId
                     String userId = receipt["UserID"].ToString();
+                    messageProcessing("received a receipt with userId: " + userId);
                     JArray list = receipt["List"] as JArray;
                     IList<JToken> products = list.Children().ToList();
                     Receipt receiptObj = new Receipt(userId);
@@ -183,22 +178,20 @@ namespace ServerApplicationWPF
                 catch (Exception e)
                 {
                     // some exception
-                    Console.WriteLine("Exception catched reading a receipt: " + e.Message);
+                    messageProcessing("Exception catched processing the receipt: " + e.Message);
                     return new NetworkResponse(NetworkResponse.ResponseType.ReceiptStorageError, Utils.StringToBytes("Error"));
                 }
             }
             else
             {
                 // some errors
-                Console.WriteLine("Unknown request type");
+                messageProcessing("Unknown request type");
                 return new NetworkResponse(NetworkResponse.ResponseType.ReceiptStorageError, Utils.StringToBytes("Error"));
             }
         }
 
         private void displayImage(Bitmap image)
         {
-            //addMessageToLog("Trying to display image");
-            //ImageDisplay.Source = (ImageSource)new ImageSourceConverter().ConvertFrom(image);
             ImageDisplay.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(image.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
@@ -218,11 +211,6 @@ namespace ServerApplicationWPF
         private void Window_Closed(object sender, EventArgs e)
         {
             //Application.Current.Shutdown(); not necessary because other thread is background
-        }
-
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-            barcodesToBeSearchedOnline.Add(barcode_txt.Text);
         }
 
         private Bitmap rotateImage90(Bitmap b)
