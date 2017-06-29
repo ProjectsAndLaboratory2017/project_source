@@ -40,12 +40,12 @@ namespace ServerApplicationWPF
 
         private void IntNumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("\\d+");
+            Regex regex = new Regex("\\d");
             e.Handled = !regex.IsMatch(e.Text);
         }
         private void PriceNumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("(\\d+)([.,]?)(\\d?\\d?)");
+            Regex regex = new Regex("[\\d,]");
             e.Handled = !regex.IsMatch(e.Text);
         }
 

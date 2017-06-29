@@ -235,7 +235,7 @@ public class DataManager
             cmd.Parameters.AddWithValue("@productId", product.ID);
             cmd.Parameters.AddWithValue("@barcode", product.Barcode);
             cmd.Parameters.AddWithValue("@name", product.Product_name);
-            cmd.Parameters.AddWithValue("@price", product.Price);
+            cmd.Parameters.AddWithValue("@price", double.Parse(product.Price));
             cmd.Parameters.AddWithValue("@storeQty", product.StoreQty);
             cmd.Parameters.AddWithValue("@warehouseQty", product.WarehouseQty);
             cmd.Parameters.AddWithValue("@points", product.Points);
